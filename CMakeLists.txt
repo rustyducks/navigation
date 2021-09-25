@@ -27,6 +27,9 @@ include_directories(
 
 add_library(geometry_tools src/Geometry/Point.cpp src/Geometry/Trajectory.cpp src/Geometry/Speed.cpp)
 
+add_executable(navigation tests/navigation.cpp src/PurePursuitControl.cpp src/RotationControl.cpp)
+target_link_libraries(navigation geometry_tools)
+
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
