@@ -18,7 +18,15 @@ if(NOT CMAKE_CROSSCOMPILING)
     enable_testing()
 endif()
 
-add_executable(navigation navigation.cpp)
+find_package(Eigen3 REQUIRED)
+
+include_directories(
+    include
+    ${Eigen3_INCLUDE_DIRS}
+)
+
+add_library(geometry_tools src/Geometry/Point.cpp src/Geometry/Trajectory.cpp src/Geometry/Speed.cpp)
+
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
