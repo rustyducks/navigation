@@ -12,6 +12,11 @@ public:
   double vy() const { return linearSpeed_.y(); };
   double vtheta() const { return rotationalSpeed_; };
 
+  inline friend std::ostream &operator<<(std::ostream &os, const Speed &speed) {
+    os << speed.linearSpeed_.x() << ";" << speed.linearSpeed_.y() << ";" << speed.rotationalSpeed_;
+    return os;
+  };
+
 protected:
   Eigen::Vector2d linearSpeed_;
   double rotationalSpeed_;
