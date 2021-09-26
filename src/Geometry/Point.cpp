@@ -30,11 +30,16 @@ Angle Angle::operator-() const {
   return -a;
 }
 
-Point::Point(double x, double y) : p_(x, y) {}
+Angle &Angle::operator+=(const Angle &rhs) {
+  r_ *= rhs.r_;
+  center();
+  return *this;
+}
 
-std::ostream &operator<<(std::ostream &os, const Point &pt) {
-  os << pt.p_.x() << ";" << pt.p_.y();
-  return os;
+Angle Angle::operator+(const Angle &rhs) const {
+  Angle a(*this);
+  a += rhs;
+  return a;
 }
 
 Angle Point::angleTo(const Point &pt) const {
@@ -42,11 +47,31 @@ Angle Point::angleTo(const Point &pt) const {
   return Angle(std::atan2(tmp.y(), tmp.x()));
 }
 
-PointOriented::PointOriented(double x, double y, double theta) : Point(x, y), a_(theta) {}
+Point::Point(double x, double y) : p_(x, y) {}
 
-std::ostream &operator<<(std::ostream &os, const PointOriented &pt) {
-  os << pt.p_.x() << ";" << pt.p_.y() << ";" << pt.a_ << "rad";
-  return os;
+Point &Point::operator+=(const Point &rhs) {
+  p_ += rhs.p_;
+  return *this;
 }
 
-} // namespace rd
+Point Point::operator+(const Point &rhs) const {
+  Point tmp(*this);
+  tmp += rhs;
+  return tmp;
+}
+
+PointOriented::PointOriented(double x, double y, double theta) : Point(x, y), a_(theta) {}
+
+PointOriented &PointOriented::operator+=(const PointOriented &rhs) {
+  p_ += rhs.p_;
+  a_ += rhs.a_;
+  return *this;
+}
+
+PointOriented PointOriented::operator+(const PointOriented &rhs) const {
+  PointOriented tmp(*this);
+  tmp += rhs;
+  return tmp;
+}
+
+}  // namespace rd

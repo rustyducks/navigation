@@ -14,6 +14,14 @@ public:
   Angle operator-(const Angle &rhs) const;
   Angle &operator-();
   Angle operator-() const;
+  Angle &operator+=(const Angle &rhs);
+  Angle operator+(const Angle &rhs) const;
+  inline bool operator<(double angle) const { return *this < Angle(angle); };
+  inline bool operator>(double angle) const { return *this > Angle(angle); };
+  inline bool operator==(double angle) const { return *this == Angle(angle); };
+  inline bool operator<(const Angle &rhs) const { return r_.smallestAngle() < rhs.r_.smallestAngle(); };
+  inline bool operator>(const Angle &rhs) const { return r_.smallestAngle() > rhs.r_.smallestAngle(); };
+  inline bool operator==(const Angle &rhs) const { return r_.smallestAngle() == rhs.r_.smallestAngle(); };
 
   double value() { return r_.smallestAngle(); };
 
@@ -33,8 +41,13 @@ public:
   virtual Angle angleTo(const Point &pt) const;
   double x() const { return p_.x(); };
   double y() const { return p_.y(); };
+  virtual Point &operator+=(const Point &rhs);
+  virtual Point operator+(const Point &rhs) const;
 
-  friend std::ostream &operator<<(std::ostream &os, const Point &pt);
+  inline friend std::ostream &operator<<(std::ostream &os, const Point &pt) {
+    os << pt.p_.x() << ";" << pt.p_.y();
+    return os;
+  };
 
 protected:
   Eigen::Vector2d p_;
@@ -45,7 +58,12 @@ public:
   PointOriented(double x, double y, double theta);
   const Angle &theta() const { return a_; };
 
-  friend std::ostream &operator<<(std::ostream &os, const PointOriented &pt);
+  inline friend std::ostream &operator<<(std::ostream &os, const PointOriented &pt) {
+    os << pt.p_.x() << ";" << pt.p_.y() << ";" << pt.a_;
+    return os;
+  };
+  virtual PointOriented &operator+=(const PointOriented &rhs);
+  virtual PointOriented operator+(const PointOriented &rhs) const;
 
 private:
   Angle a_;
