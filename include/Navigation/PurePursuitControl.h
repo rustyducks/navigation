@@ -7,21 +7,21 @@
 
 namespace rd {
 class PurePursuitControl : public PositionControlBase {
-public:
+ public:
   PurePursuitControl();
   ~PurePursuitControl() = default;
 
-  virtual Speed computeSpeed(const PointOriented &robotPose, const Speed &robotSpeed) override;
-  void setTrajectory(const Trajectory &trajectory) { trajectory_ = trajectory; };
-  const Trajectory &getTrajectory() const { return trajectory_; }
+  virtual Speed computeSpeed(const PointOriented& robotPose, const Speed& robotSpeed, double dt) override;
+  void setTrajectory(const Trajectory& trajectory) { trajectory_ = trajectory; };
+  const Trajectory& getTrajectory() const { return trajectory_; }
 
-protected:
+ protected:
   enum PurePursuitState { IDLE, FIRST_ROTATION, CRUISING, LAST_ROTATION };
   PurePursuitState state_;
   Trajectory trajectory_;
   RotationControl rotationControl_;
 };
 
-} // namespace rd
+}  // namespace rd
 
 #endif /* PUREPURSUITCONTROL_H */

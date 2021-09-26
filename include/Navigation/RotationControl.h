@@ -5,17 +5,17 @@
 #include "Navigation/PositionControlBase.h"
 namespace rd {
 class RotationControl : public PositionControlBase {
-public:
+ public:
   RotationControl();
   ~RotationControl() = default;
 
-  virtual Speed computeSpeed(const PointOriented &robotPose, const Speed &robotSpeed) override;
-  void setTargetAngle(const Angle &angle) { targetAngle_ = angle; }; // In map frame (absolute)
+  virtual Speed computeSpeed(const PointOriented &robotPose, const Speed &robotSpeed, double dt) override;
+  void setTargetAngle(const Angle &angle) { targetAngle_ = angle; };  // In map frame (absolute)
 
-protected:
-  Angle targetAngle_; // In map frame (absolute)
+ protected:
+  Angle targetAngle_;  // In map frame (absolute)
 };
 
-} // namespace rd
+}  // namespace rd
 
 #endif /* ROTATIONCONTROL_H */

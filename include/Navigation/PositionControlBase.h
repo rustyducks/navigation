@@ -6,9 +6,9 @@
 
 namespace rd {
 class PositionControlBase {
-public:
-  virtual Speed computeSpeed(const PointOriented &robotPose, const Speed &robotSpeed) = 0;
+ public:
+  virtual Speed computeSpeed(const PointOriented& robotPose, const Speed& robotSpeed, double dt) = 0;
 };
-} // namespace rd
+}  // namespace rd
 
 #endif /* POSITIONCONTROLBASE_H */
