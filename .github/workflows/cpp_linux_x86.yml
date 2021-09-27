@@ -1,0 +1,24 @@
+name: Ubuntu 20.04 x86_64 Build and Test
+
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-20.04
+    
+    steps:
+    - uses: actions/checkout@v1
+    - name: Install dependencies
+      run: sudo apt-get update && sudo apt-get install -y libeigen3-dev
+    - name: Build dir creation
+      run: mkdir build
+    - name: Cmake
+      working-directory: ./build
+      run: cmake -DENABLE_TESTS=ON ..
+    - name: make
+      working-directory: ./build
+      run: make -j4
+    - name: test
+      working-directory: ./build
+      run: ctest -V
