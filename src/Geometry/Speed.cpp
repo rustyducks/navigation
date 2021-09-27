@@ -2,4 +2,6 @@
 
 namespace rd {
 Speed::Speed(double vx, double vy, double vtheta) : linearSpeed_(vx, vy), rotationalSpeed_(vtheta) {}
-} // namespace rd
+
+double Speed::linearSpeed() const { return linearSpeed_.norm(); }
+}  // namespace rd
