@@ -2,6 +2,7 @@
 #define PUREPURSUITCONTROL_H
 
 #include "Navigation/Geometry/Trajectory.h"
+#include "Navigation/LinearControl.h"
 #include "Navigation/PositionControlBase.h"
 #include "Navigation/RotationControl.h"
 
@@ -17,9 +18,14 @@ class PurePursuitControl : public PositionControlBase {
 
  protected:
   enum PurePursuitState { IDLE, FIRST_ROTATION, CRUISING, LAST_ROTATION };
+
+  Speed cruising(const PointOriented& robotPose, const Speed& robotSpeed, double dt);
+  Speed purePursuit(const PointOriented& robotPose, const Speed& robotSpeed, double dt);
+
   PurePursuitState state_;
   Trajectory trajectory_;
   RotationControl rotationControl_;
+  LinearControl linearControl_;
 };
 
 }  // namespace rd
