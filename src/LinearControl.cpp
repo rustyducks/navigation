@@ -1,7 +1,7 @@
 #include "Navigation/LinearControl.h"
 
 namespace rd {
-LinearControl::LinearControl(){};
+LinearControl::LinearControl() {}
 
 Speed LinearControl::computeSpeed(const PointOriented& robotPose, const Speed& robotSpeed, double dt) {
   Point rp = targetPoint_.point - robotPose;

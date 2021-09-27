@@ -74,6 +74,7 @@ class Point {
   virtual Point operator-(const Point &rhs) const;
   virtual Point &operator*=(const double s);
   virtual Point operator*(const double s);
+  inline bool operator==(const Point &rhs) const { return p_ == rhs.p_; }
 
   inline friend std::ostream &operator<<(std::ostream &os, const Point &pt) {
     os << pt.p_.x() << ";" << pt.p_.y();
