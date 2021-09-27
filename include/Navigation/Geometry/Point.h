@@ -7,7 +7,9 @@
 namespace rd {
 
 class Angle {
-public:
+  friend class Point;
+
+ public:
   Angle();
   Angle(double theta);
   Angle &operator-=(const Angle &rhs);
@@ -16,6 +18,8 @@ public:
   Angle operator-() const;
   Angle &operator+=(const Angle &rhs);
   Angle operator+(const Angle &rhs) const;
+  Angle &operator*=(const double s);
+  Angle operator*(const double s) const;
   inline bool operator<(double angle) const { return *this < Angle(angle); };
   inline bool operator>(double angle) const { return *this > Angle(angle); };
   inline bool operator==(double angle) const { return *this == Angle(angle); };
@@ -23,14 +27,16 @@ public:
   inline bool operator>(const Angle &rhs) const { return r_.smallestAngle() > rhs.r_.smallestAngle(); };
   inline bool operator==(const Angle &rhs) const { return r_.smallestAngle() == rhs.r_.smallestAngle(); };
 
-  double value() { return r_.smallestAngle(); };
+  double value() const { return r_.smallestAngle(); };
+  inline double cos() const { return std::cos(r_.smallestAngle()); };
+  inline double sin() const { return std::sin(r_.smallestAngle()); };
 
   inline friend std::ostream &operator<<(std::ostream &os, const Angle &pt) {
     os << pt.r_.smallestAngle() << "rad";
     return os;
   };
 
-protected:
+ protected:
   void center();
   Eigen::Rotation2Dd r_;
 };
