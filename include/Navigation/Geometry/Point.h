@@ -85,7 +85,8 @@ class Point {
 };
 
 class PointOriented : public Point {
-public:
+ public:
+  inline PointOriented() = default;
   PointOriented(double x, double y, double theta);
   const Angle &theta() const { return a_; };
 
@@ -95,11 +96,15 @@ public:
   };
   virtual PointOriented &operator+=(const PointOriented &rhs);
   virtual PointOriented operator+(const PointOriented &rhs) const;
+  virtual PointOriented &operator-=(const PointOriented &rhs);
+  virtual PointOriented operator-(const PointOriented &rhs) const;
+  virtual PointOriented &operator*=(const double s);
+  virtual PointOriented operator*(const double rhs) const;
 
-private:
+ private:
   Angle a_;
 };
 
-} // namespace rd
+}  // namespace rd
 
 #endif /* POINT_H */

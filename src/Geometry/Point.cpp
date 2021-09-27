@@ -129,4 +129,26 @@ PointOriented PointOriented::operator+(const PointOriented &rhs) const {
   return tmp;
 }
 
+PointOriented &PointOriented::operator-=(const PointOriented &rhs) {
+  p_ -= rhs.p_;
+  a_ -= rhs.a_;
+  return *this;
+}
+PointOriented PointOriented::operator-(const PointOriented &rhs) const {
+  PointOriented tmp(*this);
+  tmp -= rhs;
+  return tmp;
+}
+
+PointOriented &PointOriented::operator*=(const double s) {
+  p_ *= s;
+  a_ *= s;
+  return *this;
+}
+PointOriented PointOriented::operator*(const double s) const {
+  PointOriented tmp(*this);
+  tmp *= s;
+  return tmp;
+}
+
 }  // namespace rd
