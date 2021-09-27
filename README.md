@@ -1,4 +1,5 @@
 # navigation
+[![Build Status](https://github.com/rustyducks/navigation/actions/workflows/cpp_linux_x86.yml/badge.svg)](https://github.com/rustyducks/navigation/actions/workflows/cpp_linux_x86.yml)
 
 ## Build
 
