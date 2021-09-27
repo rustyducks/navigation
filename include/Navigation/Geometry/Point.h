@@ -6,6 +6,8 @@
 
 namespace rd {
 
+class PointOriented;
+
 class Angle {
   friend class Point;
 
@@ -42,20 +44,43 @@ class Angle {
 };
 
 class Point {
-public:
+ public:
+  inline Point() : p_(0.0, 0.0){};
   Point(double x, double y);
   virtual Angle angleTo(const Point &pt) const;
   double x() const { return p_.x(); };
   double y() const { return p_.y(); };
+  virtual inline double squaredDistanceTo(const Point &pt) const { return (pt.p_ - p_).squaredNorm(); };
+  virtual inline double distanceTo(const Point &pt) const { return (pt.p_ - p_).norm(); };
+  virtual inline double squaredNorm() const { return p_.squaredNorm(); };
+  virtual inline double norm() const { return p_.norm(); };
+  inline double dot(const Point &pt) const { return p_.dot(pt.p_); }
+  /**
+   * @brief Finds the closest point to *this on the ab segment.
+   *
+   * @param a First point of the segment
+   * @param b Second point of the segment
+   * @param t (out) the interpolation factor
+   * @return Point The closest point from *this on the ab segment
+   * (Point = a + t * (b - a))
+   */
+  virtual Point closestPointBetween(const Point &a, const Point &b, double &t) const;
+  virtual Point transformIn(const PointOriented &frame) const;
+  Angle polarAngle() const;
   virtual Point &operator+=(const Point &rhs);
   virtual Point operator+(const Point &rhs) const;
+  virtual Point operator-() const;
+  virtual Point &operator-=(const Point &rhs);
+  virtual Point operator-(const Point &rhs) const;
+  virtual Point &operator*=(const double s);
+  virtual Point operator*(const double s);
 
   inline friend std::ostream &operator<<(std::ostream &os, const Point &pt) {
     os << pt.p_.x() << ";" << pt.p_.y();
     return os;
   };
 
-protected:
+ protected:
   Eigen::Vector2d p_;
 };
 
