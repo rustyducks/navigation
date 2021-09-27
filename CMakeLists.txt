@@ -18,6 +18,9 @@ if(NOT CMAKE_CROSSCOMPILING)
     enable_testing()
 endif()
 
+add_compile_options(-Wall -Wextra -pedantic -Werror)
+set (CMAKE_CXX_STANDARD 11)
+
 find_package(Eigen3 REQUIRED)
 
 include_directories(
@@ -27,7 +30,7 @@ include_directories(
 
 add_library(geometry_tools src/Geometry/Point.cpp src/Geometry/Trajectory.cpp src/Geometry/Speed.cpp)
 
-add_executable(navigation tests/navigation.cpp src/PurePursuitControl.cpp src/RotationControl.cpp)
+add_executable(navigation tests/navigation.cpp src/PurePursuitControl.cpp src/RotationControl.cpp src/LinearControl.cpp)
 target_link_libraries(navigation geometry_tools)
 
 
