@@ -71,15 +71,19 @@ Speed PurePursuitControl::cruising(const PointOriented& robotPose, const Speed& 
 }
 
 Speed PurePursuitControl::purePursuit(const PointOriented& robotPose, const Speed& robotSpeed, double dt) {
-  Point goal = trajectory_.pointAtDistanceFrom(param<double>(PURE_PURSUIT_LOOKAHEAD_DISTANCE), robotPose);
-  linearControl_.setTargetPoint(trajectory_.at(1));
+  size_t previousClosestIndex;
+  Point goal = trajectory_.pointAtDistanceFrom(param<double>(PURE_PURSUIT_LOOKAHEAD_DISTANCE), robotPose, previousClosestIndex);
+  trajectoryCurrentIndex_ = previousClosestIndex + 1;
+  linearControl_.setTargetPoint(trajectory_.at(trajectoryCurrentIndex_));
   Speed linear = linearControl_.computeSpeed(robotPose, robotSpeed, dt);
   double vx = linear.linearSpeed();  // Only the magnitude of the speed interest us, the rest is handled via steering
   Point robot2Goal = goal.transformIn(robotPose);
-  double curvature = 2 * goal.y() / robot2Goal.norm();
+  double curvature = 2 * robot2Goal.y() / robot2Goal.squaredNorm();
   double vtheta = vx * curvature;
   if (std::abs(vtheta) > param<double>(MAX_ROTATIONAL_SPEED)) {
     vtheta = std::min(param<double>(MAX_ROTATIONAL_SPEED), std::max(-param<double>(MAX_ROTATIONAL_SPEED), vtheta));
+    // vtheta = std::min(robotSpeed.vtheta() + param<double>(MAX_ROTATIONAL_ACCELERATION) * dt,
+    //                  std::max(robotSpeed.vtheta() - param<double>(MAX_ROTATIONAL_ACCELERATION) * dt, vtheta));
     assert(curvature != 0.0);  // curvature can't be 0, else, vtheta would have been 0, and not exceeding max speed.
     vx = vtheta / curvature;
   }

@@ -13,7 +13,11 @@ class PurePursuitControl : public PositionControlBase {
   ~PurePursuitControl() = default;
 
   virtual Speed computeSpeed(const PointOriented& robotPose, const Speed& robotSpeed, double dt) override;
-  void setTrajectory(const Trajectory& trajectory) { trajectory_ = trajectory; };
+  void setTrajectory(const Trajectory& trajectory) {
+    trajectory_ = trajectory;
+    trajectoryCurrentIndex_ = 1;
+    state_ = FIRST_ROTATION;
+  };
   const Trajectory& getTrajectory() const { return trajectory_; }
 
  protected:
@@ -26,6 +30,7 @@ class PurePursuitControl : public PositionControlBase {
   Trajectory trajectory_;
   RotationControl rotationControl_;
   LinearControl linearControl_;
+  size_t trajectoryCurrentIndex_;
 };
 
 }  // namespace rd
