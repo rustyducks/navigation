@@ -87,7 +87,8 @@ class Point {
 
 class PointOriented : public Point {
  public:
-  inline PointOriented() = default;
+  PointOriented() = default;
+  virtual ~PointOriented() = default;
   PointOriented(double x, double y, double theta);
   const Angle &theta() const { return a_; };
 
