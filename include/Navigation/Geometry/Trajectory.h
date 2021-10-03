@@ -47,7 +47,7 @@ class Trajectory {
    * @param pointStart the starting point (will be projected on the trajectory)
    * @return Point the point on the trajectory at a distance from the projection of pointStart on the trajectory
    */
-  Point pointAtDistanceFrom(const double distance, const Point &pointStart);
+  Point pointAtDistanceFrom(const double distance, const Point &pointStart, size_t &previousClosestIndex);
 
   void pop() { pointspeeds_.pop_front(); };
   const PointOrientedSpeed &at(size_t i) const;

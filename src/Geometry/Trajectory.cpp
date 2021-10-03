@@ -67,10 +67,10 @@ Point Trajectory::nextPointClosestTo(const Point &point, double &tOut, size_t &c
   return pointMin;
 }
 
-Point Trajectory::pointAtDistanceFrom(const double distance, const Point &pointStart) {
+Point Trajectory::pointAtDistanceFrom(const double distance, const Point &pointStart, size_t &previousClosestIndex) {
   double t;
   size_t previousIndex;
-  Point proj = nextPointClosestTo(pointStart, t, previousIndex);
+  Point proj = pointWithSpeedClosestTo(pointStart, t, previousIndex);
 
   double distanceLeft = distance;
   double pathLen = pointspeeds_.at(previousIndex + 1).point.distanceTo(proj);
@@ -90,6 +90,7 @@ Point Trajectory::pointAtDistanceFrom(const double distance, const Point &pointS
   Point ab = pointspeeds_.at(browsingTraj + 1).point - pointspeeds_.at(browsingTraj).point;
   double tGoal = t + distanceLeft / ab.norm();
   Point goal = (Point)pointspeeds_.at(browsingTraj).point + ab * tGoal;
+  previousClosestIndex = browsingTraj;
   return goal;
 }
 
