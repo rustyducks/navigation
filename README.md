@@ -9,7 +9,7 @@
 ### Install dependencies on Debian based
 
 ```bash
-sudo apt update && sudo apt install libeigen3-dev
+sudo apt update && sudo apt install libeigen3-dev ivy-c-dev
 ```
 
 ## Build
