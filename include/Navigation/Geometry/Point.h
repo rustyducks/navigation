@@ -22,16 +22,16 @@ class Angle {
   Angle operator+(const Angle &rhs) const;
   Angle &operator*=(const double s);
   Angle operator*(const double s) const;
-  inline bool operator<(double angle) const { return *this < Angle(angle); };
-  inline bool operator>(double angle) const { return *this > Angle(angle); };
-  inline bool operator==(double angle) const { return *this == Angle(angle); };
-  inline bool operator<(const Angle &rhs) const { return r_.smallestAngle() < rhs.r_.smallestAngle(); };
-  inline bool operator>(const Angle &rhs) const { return r_.smallestAngle() > rhs.r_.smallestAngle(); };
-  inline bool operator==(const Angle &rhs) const { return r_.smallestAngle() == rhs.r_.smallestAngle(); };
+  bool operator<(double angle) const { return *this < Angle(angle); }
+  bool operator>(double angle) const { return *this > Angle(angle); }
+  bool operator==(double angle) const { return *this == Angle(angle); }
+  bool operator<(const Angle &rhs) const { return r_.smallestAngle() < rhs.r_.smallestAngle(); }
+  bool operator>(const Angle &rhs) const { return r_.smallestAngle() > rhs.r_.smallestAngle(); }
+  bool operator==(const Angle &rhs) const { return r_.smallestAngle() == rhs.r_.smallestAngle(); }
 
-  double value() const { return r_.smallestAngle(); };
-  inline double cos() const { return std::cos(r_.smallestAngle()); };
-  inline double sin() const { return std::sin(r_.smallestAngle()); };
+  double value() const { return r_.smallestAngle(); }
+  double cos() const { return std::cos(r_.smallestAngle()); }
+  double sin() const { return std::sin(r_.smallestAngle()); }
 
   inline friend std::ostream &operator<<(std::ostream &os, const Angle &pt) {
     os << pt.r_.smallestAngle() << "rad";
@@ -48,12 +48,13 @@ class Point {
   inline Point() : p_(0.0, 0.0){};
   Point(double x, double y);
   virtual Angle angleTo(const Point &pt) const;
-  double x() const { return p_.x(); };
-  double y() const { return p_.y(); };
-  virtual inline double squaredDistanceTo(const Point &pt) const { return (pt.p_ - p_).squaredNorm(); };
-  virtual inline double distanceTo(const Point &pt) const { return (pt.p_ - p_).norm(); };
-  virtual inline double squaredNorm() const { return p_.squaredNorm(); };
-  virtual inline double norm() const { return p_.norm(); };
+  Angle angleBetweenVectors(const Point &pt) const;
+  double x() const { return p_.x(); }
+  double y() const { return p_.y(); }
+  virtual double squaredDistanceTo(const Point &pt) const { return (pt.p_ - p_).squaredNorm(); }
+  virtual double distanceTo(const Point &pt) const { return (pt.p_ - p_).norm(); }
+  virtual double squaredNorm() const { return p_.squaredNorm(); }
+  virtual double norm() const { return p_.norm(); }
   inline double dot(const Point &pt) const { return p_.dot(pt.p_); }
   /**
    * @brief Finds the closest point to *this on the ab segment.
