@@ -16,6 +16,7 @@ class Trajectory {
  public:
   Trajectory();
   Trajectory(const std::vector<PointOriented> &points);
+  static Trajectory lissajouTrajectory(const PointOriented &robotPose, double tStep);
   /**
    * @brief Finds the closest point on the trajectory to the point given. The returned point is the linear interpolation of factor tOut
    * between the points at closestPrevIndex and closestPrevIndex + 1. The search stops if a point on the trajectory has a null speed.

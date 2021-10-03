@@ -7,6 +7,16 @@ Trajectory::Trajectory() : pointspeeds_({}) {}
 
 Trajectory::Trajectory(const std::vector<PointOriented> &) {}
 
+Trajectory Trajectory::lissajouTrajectory(const PointOriented &robotPose, const double tStep) {
+  double theta = 0.;
+  std::vector<PointOriented> pts;
+  while (theta < 2 * M_PI) {
+    pts.emplace_back(robotPose.x() + 500 * std::sin(theta), robotPose.y() + 500 * std::sin(2 * theta), 0.0);
+    theta += tStep;
+  }
+  return Trajectory(pts);
+}
+
 const PointOrientedSpeed &Trajectory::at(size_t i) const { return pointspeeds_.at(i); }
 
 Point Trajectory::pointWithSpeedClosestTo(const Point &point, double &tOut, size_t &closestPrevIndex) const {
