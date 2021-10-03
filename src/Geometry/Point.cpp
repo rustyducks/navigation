@@ -60,6 +60,11 @@ Angle Point::angleTo(const Point &pt) const {
   return Angle(std::atan2(tmp.y(), tmp.x()));
 }
 
+Angle Point::angleBetweenVectors(const Point &pt) const {
+  Angle a(std::acos(this->dot(pt) / (this->norm() * pt.norm())));
+  return a;
+}
+
 Point Point::closestPointBetween(const Point &a, const Point &b, double &t) const {
   Point ab = b - a;
   Point ap = *this - a;
@@ -112,7 +117,7 @@ Point &Point::operator*=(const double s) {
 Point Point::operator*(const double s) {
   Point tmp(*this);
   tmp *= s;
-  return *this;
+  return tmp;
 }
 
 PointOriented::PointOriented(double x, double y, double theta) : Point(x, y), a_(theta) {}
