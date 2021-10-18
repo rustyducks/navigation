@@ -41,6 +41,7 @@ Speed LinearControl::computeSpeed(const PointOriented& robotPose, const Speed& r
       commandSpeed = robotLSpeed;
     }
   }
+  commandSpeed = std::min(param<double>(MAX_LINEAR_SPEED), std::max(-param<double>(MAX_LINEAR_SPEED), commandSpeed));
   if (param<bool>(IS_HOLONOMIC)) {
     Point robot2target = targetPoint_.point.transformIn(robotPose);
     Angle robot2targetAngle = robot2target.polarAngle();
