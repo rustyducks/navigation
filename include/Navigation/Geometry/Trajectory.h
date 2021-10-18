@@ -29,7 +29,8 @@ class Trajectory {
    */
   Point pointWithSpeedClosestTo(const Point &point, double &tOut, size_t &closestPrevIndex) const;
   /**
-   * @brief Finds the closest point on the trajectory to the given point. The search stops when the distance to the point increases (In case of trajectory crossings).
+   * @brief Finds the closest point on the trajectory to the given point. The search stops when the distance to the point increases (In case of trajectory
+   * crossings).
    *
    * @param point The point to search for the closest point on the trajectory
    * @param tOut The interpolation factor
@@ -45,15 +46,19 @@ class Trajectory {
    *
    * @param distance the distance along the trajectory
    * @param pointStart the starting point (will be projected on the trajectory)
-   * @return Point the point on the trajectory at a distance from the projection of pointStart on the trajectory
+   * @return Point the point on the trajectory at a distance from the projection of pointStart on the trajectory, along with an interpolated speed
    */
   Point pointAtDistanceFrom(const double distance, const Point &pointStart, size_t &previousClosestIndex);
+
+  double mengerCurvature(const size_t i) const;
 
   void pop() { pointspeeds_.pop_front(); };
   const PointOrientedSpeed &at(size_t i) const;
   size_t size() const { return pointspeeds_.size(); };
 
  protected:
+  void computeSpeeds();
+
   std::deque<PointOrientedSpeed> pointspeeds_;
 };
 }  // namespace rd
