@@ -1,18 +1,9 @@
 #include "Navigation/PurePursuitControl.h"
 
 #include "Navigation/Communication/Ivy.h"
+#include "Navigation/Parameters.h"
 
 namespace rd {
-PurePursuitControl::PurePursuitControl() : trajectory_() {
-  linearControl_.setParam(IS_HOLONOMIC, false);
-  rotationControl_.setParam(MAX_ROTATIONAL_SPEED, 1.0);  // Todo (guilhembn): Do not pass parameters like so...
-  rotationControl_.setParam(MAX_ROTATIONAL_ACCELERATION, 0.1);
-  rotationControl_.setParam(ADMITTED_ANGLE_POSITION_ERROR, 0.05);
-  linearControl_.setParam(ParamName::MAX_LINEAR_ACCELERATION, 10.);
-  linearControl_.setParam(ParamName::MAX_LINEAR_SPEED, 100.);
-  linearControl_.setParam(ADMITTED_LINEAR_POSITION_ERROR, 5.);
-  linearControl_.setParam(LINEAR_CONTROL_STOP_DISTANCE_FACTOR, 2.);
-}
 
 Speed PurePursuitControl::computeSpeed(const PointOriented& robotPose, const Speed& robotSpeed, double dt) {
   Angle targetAngle;
@@ -23,8 +14,7 @@ Speed PurePursuitControl::computeSpeed(const PointOriented& robotPose, const Spe
     case PurePursuitState::FIRST_ROTATION:
 
       targetAngle = robotPose.angleTo(trajectory_.at(1).point);  // trajectory.at(0) is past point, in order for the interpolation to work
-      if (std::abs(robotSpeed.vtheta()) <= 0.01 &&
-          std::abs((targetAngle - robotPose.theta()).value()) < 0.05) {  // Todo (guilhembn): Find a way to pass parameters
+      if (std::abs(robotSpeed.vtheta()) <= 0.01 && std::abs((targetAngle - robotPose.theta()).value()) < ADMITTED_ANGLE_POSITION_ERROR) {
         state_ = PurePursuitState::CRUISING;
         return cruising(robotPose, robotSpeed, dt);
       } else {
@@ -38,7 +28,7 @@ Speed PurePursuitControl::computeSpeed(const PointOriented& robotPose, const Spe
       return cruising(robotPose, robotSpeed, dt);
       break;
     case PurePursuitState::LAST_ROTATION:
-      if (std::abs(robotSpeed.vtheta()) <= 0.01 && std::abs((trajectory_.at(0).point.theta() - robotPose.theta()).value()) < 0.05) {
+      if (std::abs(robotSpeed.vtheta()) <= 0.01 && std::abs((trajectory_.at(0).point.theta() - robotPose.theta()).value()) < ADMITTED_ANGLE_POSITION_ERROR) {
         trajectory_.pop();
         assert(trajectory_.size() == 0);
         state_ = PurePursuitState::IDLE;
@@ -58,7 +48,7 @@ Speed PurePursuitControl::cruising(const PointOriented& robotPose, const Speed& 
   double nextTrajSpeed = trajectory_.at(trajectoryCurrentIndex_).speed;
   double positionError = robotPose.distanceTo(nextTrajPoint);
   Ivy::getInstance().sendPoint(5, nextTrajPoint);
-  if (positionError < param<double>(ADMITTED_LINEAR_POSITION_ERROR)) {
+  if (positionError < ADMITTED_LINEAR_POSITION_ERROR) {
     // If we are not too far
     if (trajectoryCurrentIndex_ == trajectory_.size() - 1) {
       // If it is the last point of the trajectory, start final rotation
@@ -94,16 +84,16 @@ Speed PurePursuitControl::cruising(const PointOriented& robotPose, const Speed& 
 
 Speed PurePursuitControl::purePursuit(const PointOriented& robotPose, const Speed& robotSpeed, double dt) {
   size_t previousClosestIndex;
-  Point goal = trajectory_.pointAtDistanceFrom(param<double>(PURE_PURSUIT_LOOKAHEAD_DISTANCE), robotPose, previousClosestIndex);
   trajectoryCurrentIndex_ = previousClosestIndex + 1;
   linearControl_.setTargetPoint(trajectory_.at(trajectoryCurrentIndex_));
   Speed linear = linearControl_.computeSpeed(robotPose, robotSpeed, dt);
   double vx = linear.linearSpeed();  // Only the magnitude of the speed interest us, the rest is handled via steering
+  Point goal = trajectory_.pointAtDistanceFrom(PURE_PURSUIT_LOOKAHEAD_DISTANCE, robotPose, previousClosestIndex);
   Point robot2Goal = goal.transformIn(robotPose);
   double curvature = 2 * robot2Goal.y() / robot2Goal.squaredNorm();
   double vtheta = vx * curvature;
-  if (std::abs(vtheta) > param<double>(MAX_ROTATIONAL_SPEED)) {
-    vtheta = std::min(param<double>(MAX_ROTATIONAL_SPEED), std::max(-param<double>(MAX_ROTATIONAL_SPEED), vtheta));
+  if (std::abs(vtheta) > MAX_ROTATIONAL_SPEED) {
+    vtheta = std::min(MAX_ROTATIONAL_SPEED, std::max(-MAX_ROTATIONAL_SPEED, vtheta));
     // vtheta = std::min(robotSpeed.vtheta() + param<double>(MAX_ROTATIONAL_ACCELERATION) * dt,
     //                  std::max(robotSpeed.vtheta() - param<double>(MAX_ROTATIONAL_ACCELERATION) * dt, vtheta));
     assert(curvature != 0.0);  // curvature can't be 0, else, vtheta would have been 0, and not exceeding max speed.

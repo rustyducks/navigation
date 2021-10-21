@@ -3,6 +3,7 @@
 #include <iostream>
 
 #include "Navigation/Communication/Ivy.h"
+#include "Navigation/Parameters.h"
 #include "Navigation/PositionControlBase.h"
 #include "Navigation/PurePursuitControl.h"
 #include "Navigation/RotationControl.h"
@@ -26,12 +27,6 @@ TEST_F(RotationControlTest, Params) {
   Speed robotSpeed(0.0, 0.0, 0.0);
   double dt = 0.1;
   rc_.setTargetAngle(0.5);
-  ASSERT_THROW(rc_.computeSpeed(robotPose, robotSpeed, dt), UnknownParamError);
-  rc_.setParam(MAX_ROTATIONAL_SPEED, 0.5);
-  ASSERT_THROW(rc_.computeSpeed(robotPose, robotSpeed, dt), UnknownParamError);
-  rc_.setParam(MAX_ROTATIONAL_ACCELERATION, 0.1);
-  ASSERT_THROW(rc_.computeSpeed(robotPose, robotSpeed, dt), UnknownParamError);
-  rc_.setParam(ADMITTED_ANGLE_POSITION_ERROR, 0.05);
   ASSERT_NO_THROW(rc_.computeSpeed(robotPose, robotSpeed, dt));
 }
 
@@ -39,10 +34,7 @@ TEST_F(RotationControlTest, Control) {
   PointOriented robotPose(1.0, 2.4, 0.0);
   Speed robotSpeed(0.0, 0.0, 0.0);
   double dt = 0.1;
-  rc_.setParam(MAX_ROTATIONAL_SPEED, 0.2);
-  rc_.setParam(MAX_ROTATIONAL_ACCELERATION, 0.05);
-  rc_.setParam(ADMITTED_ANGLE_POSITION_ERROR, 0.05);
-  rc_.setTargetAngle(1.5);
+  rc_.setTargetAngle(2.5);
   Speed s;
   for (size_t i = 0; i < 5; i++) {
     robotSpeed = rc_.computeSpeed(robotPose, robotSpeed, dt);
@@ -50,45 +42,26 @@ TEST_F(RotationControlTest, Control) {
   }
   ASSERT_FLOAT_EQ(robotSpeed.vx(), 0.0);
   ASSERT_FLOAT_EQ(robotSpeed.vy(), 0.0);
-  ASSERT_FLOAT_EQ(robotSpeed.vtheta(), 0.025);
-  for (size_t i = 0; i < 35; i++) {
+  ASSERT_FLOAT_EQ(robotSpeed.vtheta(), 5 * MAX_ROTATIONAL_ACCELERATION * dt);
+  for (size_t i = 0; i < 350; i++) {
     robotSpeed = rc_.computeSpeed(robotPose, robotSpeed, dt);
     simulate(robotPose, robotSpeed, dt);
-  }
-  ASSERT_FLOAT_EQ(robotSpeed.vx(), 0.0);
-  ASSERT_FLOAT_EQ(robotSpeed.vy(), 0.0);
-  ASSERT_FLOAT_EQ(robotSpeed.vtheta(), 0.20);
-  for (size_t i = 0; i < 10; i++) {
-    robotSpeed = rc_.computeSpeed(robotPose, robotSpeed, dt);
-    simulate(robotPose, robotSpeed, dt);
-  }
-  ASSERT_FLOAT_EQ(robotSpeed.vx(), 0.0);
-  ASSERT_FLOAT_EQ(robotSpeed.vy(), 0.0);
-  ASSERT_FLOAT_EQ(robotSpeed.vtheta(), 0.20);
-  for (size_t i = 0; i < 10; i++) {
-    robotSpeed = rc_.computeSpeed(robotPose, robotSpeed, dt);
-    simulate(robotPose, robotSpeed, dt);
-  }
-  ASSERT_FLOAT_EQ(robotSpeed.vx(), 0.0);
-  ASSERT_FLOAT_EQ(robotSpeed.vy(), 0.0);
-  ASSERT_NE(robotSpeed.vtheta(), 0.20);
-  ASSERT_NE(robotSpeed.vtheta(), 0.0);
-  for (size_t i = 0; i < 100; i++) {
-    robotSpeed = rc_.computeSpeed(robotPose, robotSpeed, dt);
-    simulate(robotPose, robotSpeed, dt);
+    ASSERT_FLOAT_EQ(robotSpeed.vx(), 0.0);
+    ASSERT_FLOAT_EQ(robotSpeed.vy(), 0.0);
+    ASSERT_LE(robotSpeed.vtheta(), MAX_ROTATIONAL_SPEED);
   }
   ASSERT_FLOAT_EQ(robotSpeed.vx(), 0.0);
   ASSERT_FLOAT_EQ(robotSpeed.vy(), 0.0);
   ASSERT_FLOAT_EQ(robotSpeed.vtheta(), 0.0);
   ASSERT_FLOAT_EQ(robotPose.x(), 1.0);
   ASSERT_FLOAT_EQ(robotPose.y(), 2.4);
-  ASSERT_LE(std::abs(robotPose.theta().value() - 1.5), 0.05);
+  ASSERT_LE(std::abs(robotPose.theta().value() - 2.5), ADMITTED_ANGLE_POSITION_ERROR);
   rc_.setTargetAngle(1.0);
   for (size_t i = 0; i < 10; i++) {
     robotSpeed = rc_.computeSpeed(robotPose, robotSpeed, dt);
     simulate(robotPose, robotSpeed, dt);
+    ASSERT_LE(robotSpeed.vtheta(), 0.0);
   }
-  ASSERT_LE(robotSpeed.vtheta(), 0.0);
 }
 
 class PurePursuitControlTest : public ::testing::Test {
@@ -98,7 +71,7 @@ class PurePursuitControlTest : public ::testing::Test {
   PurePursuitControl pp_;
 };
 
-/*TEST_F(PurePursuitControlTest, Control) {
+TEST_F(PurePursuitControlTest, Control) {
   Ivy& ivy = Ivy::getInstance();
   PointOriented robotPose(600.0, 730.0, 0.5);
   Speed robotSpeed(0.0, 0.0, 0.0);
@@ -107,16 +80,17 @@ class PurePursuitControlTest : public ::testing::Test {
   Trajectory traj2 = Trajectory::lissajouTrajectory(robotPose, 0.05);
   ivy.sendTrajectory(traj2);
   pp_.setTrajectory(traj2);
-  pp_.setParam(ADMITTED_LINEAR_POSITION_ERROR, 5.0);
-  pp_.setParam(PURE_PURSUIT_LOOKAHEAD_DISTANCE, 100.);
-  pp_.setParam(MAX_ROTATIONAL_SPEED, 1.0);
-  pp_.setParam(MAX_ROTATIONAL_ACCELERATION, 0.1);
   for (size_t i = 0; i < 2000; i++) {
     robotSpeed = pp_.computeSpeed(robotPose, robotSpeed, dt);
     simulate(robotPose, robotSpeed, dt);
+    ivy.sendRobotPose(robotPose);
     std::cout << robotPose << "  " << robotSpeed << std::endl;
     usleep(dt * 1000000);
-  }*/
+    if (pp_.isGoalReached()) {
+      break;
+    }
+  }
+}
 /*TEST_F(PurePursuitControlTest, TrajTests) {
   Ivy& ivy = Ivy::getInstance();
   Trajectory traj({{600, 600, 0.}, {700, 700, 0}, {800, 700, 0}});
