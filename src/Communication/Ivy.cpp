@@ -8,7 +8,7 @@ namespace rd {
 Ivy::Ivy() {
   IvyInit("Navigation", "Navigation Online", nullptr, nullptr, nullptr, nullptr);
   IvyStart("127.255.255.255:2010");
-  ivyThread_ = std::thread(IvyMainLoop);
+  // ivyThread_ = std::thread(IvyMainLoop);
 }
 
 Ivy::~Ivy() {
