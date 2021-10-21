@@ -4,6 +4,7 @@
 #include "Navigation/Parameters.h"
 
 namespace rd {
+PurePursuitControl::PurePursuitControl() : trajectory_(), isGoalReached_(false) {}
 
 Speed PurePursuitControl::computeSpeed(const PointOriented& robotPose, const Speed& robotSpeed, double dt) {
   Angle targetAngle;
@@ -32,6 +33,7 @@ Speed PurePursuitControl::computeSpeed(const PointOriented& robotPose, const Spe
         trajectory_.pop();
         assert(trajectory_.size() == 0);
         state_ = PurePursuitState::IDLE;
+        isGoalReached_ = true;
         return Speed(0.0, 0.0, 0.0);
       } else {
         return rotationControl_.computeSpeed(robotPose, robotSpeed, dt);
@@ -83,12 +85,14 @@ Speed PurePursuitControl::cruising(const PointOriented& robotPose, const Speed& 
 }
 
 Speed PurePursuitControl::purePursuit(const PointOriented& robotPose, const Speed& robotSpeed, double dt) {
-  size_t previousClosestIndex;
-  trajectoryCurrentIndex_ = previousClosestIndex + 1;
-  linearControl_.setTargetPoint(trajectory_.at(trajectoryCurrentIndex_));
+  size_t nextClosestIndex;
+  trajectory_.pointAtDistanceFrom(0, robotPose, nextClosestIndex);
+  linearControl_.setTargetPoint(trajectory_.at(nextClosestIndex + 1));
   Speed linear = linearControl_.computeSpeed(robotPose, robotSpeed, dt);
   double vx = linear.linearSpeed();  // Only the magnitude of the speed interest us, the rest is handled via steering
+  size_t previousClosestIndex;
   Point goal = trajectory_.pointAtDistanceFrom(PURE_PURSUIT_LOOKAHEAD_DISTANCE, robotPose, previousClosestIndex);
+  trajectoryCurrentIndex_ = previousClosestIndex + 1;
   Point robot2Goal = goal.transformIn(robotPose);
   double curvature = 2 * robot2Goal.y() / robot2Goal.squaredNorm();
   double vtheta = vx * curvature;

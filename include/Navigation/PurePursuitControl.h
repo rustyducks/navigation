@@ -17,8 +17,10 @@ class PurePursuitControl : public PositionControlBase {
     trajectory_ = trajectory;
     trajectoryCurrentIndex_ = 1;
     state_ = FIRST_ROTATION;
+    isGoalReached_ = false;
   };
   const Trajectory& getTrajectory() const { return trajectory_; }
+  bool isGoalReached() const { return isGoalReached_; }
 
  protected:
   enum PurePursuitState { IDLE, FIRST_ROTATION, CRUISING, LAST_ROTATION };
@@ -31,6 +33,7 @@ class PurePursuitControl : public PositionControlBase {
   RotationControl rotationControl_;
   LinearControl linearControl_;
   size_t trajectoryCurrentIndex_;
+  bool isGoalReached_;
 };
 
 }  // namespace rd
