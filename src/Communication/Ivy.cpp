@@ -2,13 +2,19 @@
 
 #include <Ivy/ivy.h>
 #include <Ivy/ivyloop.h>
+#include <Ivy/timer.h>
 
 #include <sstream>
 namespace rd {
+
+void quit(TimerId, void*, unsigned long) {}
+
 Ivy::Ivy() {
-  IvyInit("Navigation", "Navigation Online", nullptr, nullptr, nullptr, nullptr);
+  char name[] = "Navigation";
+  IvyInit(name, "Navigation Online", nullptr, nullptr, nullptr, nullptr);
   IvyStart("127.255.255.255:2010");
-  // ivyThread_ = std::thread(IvyMainLoop);
+  TimerRepeatAfter(TIMER_LOOP, 1000, quit, 0);  // Hack for Ivy, makes Ivy loop actually loop and check for ivy stop.
+  ivyThread_ = std::thread(IvyMainLoop);
 }
 
 Ivy::~Ivy() {

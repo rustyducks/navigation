@@ -22,7 +22,6 @@ class Ivy {
   Ivy();
   Ivy(const Ivy&);
   void operator=(const Ivy&);
-
   std::thread ivyThread_;
 };
 }  // namespace rd
