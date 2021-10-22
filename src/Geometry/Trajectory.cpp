@@ -8,7 +8,6 @@ namespace rd {
 Trajectory::Trajectory() : pointspeeds_({}) {}
 
 Trajectory::Trajectory(const std::vector<PointOriented> &points) {
-  std::cout << "CTOR" << std::endl;
   for (PointOriented p : points) {
     pointspeeds_.push_back({p, 0.0});
   }
@@ -129,23 +128,17 @@ void Trajectory::computeSpeeds() {
   }
   pointspeeds_.front().speed = 0.;
   pointspeeds_.back().speed = 0.;
-  std::cout << "mlop" << std::endl;
-  std::cout << pointspeeds_.size() << std::endl;
   for (size_t i = 1; i < pointspeeds_.size() - 1; i++) {
-    std::cout << "mlop" << std::endl;
     const PointOriented &x = pointspeeds_.at(i - 1).point;
     const PointOriented &y = pointspeeds_.at(i).point;
     const PointOriented &z = pointspeeds_.at(i + 1).point;
     const Angle &angle = (y - x).angleBetweenVectors(z - y);
     const double a = 100. / (M_PI / 30 - M_PI / 8);  // a = max_speed / (slowing_starting_angle - stop_angle)
     const double b = -a * M_PI / 8;                  // b = a * stop_angle
-    std::cout << angle.value() << std::endl;
-    std::cout << a * angle.value() + b << std::endl;
     pointspeeds_.at(i).speed = std::min(100., std::max(0., a * angle.value() + b));
   }
 
   for (int i = pointspeeds_.size() - 2; i >= 0; i--) {
-    std::cout << i << std::endl;
     // Browse the trajectory in reverse to find if the speed at a point dictates the speed at a previous one
     const PointOrientedSpeed &next = pointspeeds_.at(i + 1);
     const PointOrientedSpeed &current = pointspeeds_.at(i);
