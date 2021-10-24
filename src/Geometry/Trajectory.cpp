@@ -2,8 +2,6 @@
 
 #include <limits>
 
-#include "Navigation/Communication/Ivy.h"
-
 namespace rd {
 Trajectory::Trajectory() : pointspeeds_({}) {}
 
@@ -74,47 +72,110 @@ Point Trajectory::nextPointClosestTo(const Point &point, double &tOut, size_t &c
   return pointMin;
 }
 
-Point Trajectory::pointAtDistanceFrom(const double distance, const Point &pointStart, size_t &previousClosestIndex) {
+Point Trajectory::pointAtDistanceFrom(const double distance, const Point &pointStart, size_t &previousClosestIndex, bool withSpeed) const {
   double t;
   size_t previousIndex;
-  // Ivy::getInstance().sendPoint(4, pointStart);
   Point proj = pointWithSpeedClosestTo(pointStart, t, previousIndex);
-  // Ivy::getInstance().sendPoint(6, proj);
 
   double distanceLeft = distance;
   double pathLen = pointspeeds_.at(previousIndex + 1).point.distanceTo(proj);
   size_t browsingTraj = previousIndex;
   while (distanceLeft > pathLen) {  // while the distance left is greater than the length of a full segment
-    if (pointspeeds_.at(browsingTraj + 1).speed == 0.0) {
+    if (withSpeed && pointspeeds_.at(browsingTraj + 1).speed == 0.0) {
       // If the robot must stop on this point, do not explore the rest, manage to get it there
       t = 0.;
       distanceLeft = (pointspeeds_.at(browsingTraj + 1).point - pointspeeds_.at(browsingTraj).point).norm();
       break;
     }
     t = 0.;
-    browsingTraj++;
+    browsingTraj += 1;
     distanceLeft -= pathLen;
     pathLen = (pointspeeds_.at(browsingTraj + 1).point - pointspeeds_.at(browsingTraj).point).norm();
   }
   Point ab = pointspeeds_.at(browsingTraj + 1).point - pointspeeds_.at(browsingTraj).point;
   double tGoal = t + distanceLeft / ab.norm();
   Point goal = (Point)pointspeeds_.at(browsingTraj).point + ab * tGoal;
-  // Ivy::getInstance().sendPoint(5, goal);
   previousClosestIndex = browsingTraj;
   return goal;
 }
 
-double Trajectory::mengerCurvature(const size_t i) const {
+Point Trajectory::pointAtBackwardDistanceFrom(const double distance, const Point &pointStart, size_t &previousClosestIndex, bool withSpeed) const {
+  double t;
+  size_t previousIndex;
+  Point proj = pointWithSpeedClosestTo(pointStart, t, previousIndex);
+  double distanceLeft = std::abs(distance);
+  double pathLen = pointspeeds_.at(previousIndex).point.distanceTo(proj);
+  size_t browsingTraj = previousIndex;
+  while (distanceLeft > pathLen) {  // while the distance left is greater than the length of a full segment
+    if (withSpeed && pointspeeds_.at(browsingTraj).speed == 0.0) {
+      // If the robot must stop on this point, do not explore the rest, manage to get it there
+      t = 1.;
+      distanceLeft = (pointspeeds_.at(browsingTraj + 1).point - pointspeeds_.at(browsingTraj).point).norm();
+      break;
+    }
+    t = 1.;
+    browsingTraj -= 1;
+    distanceLeft -= pathLen;
+    pathLen = (pointspeeds_.at(browsingTraj + 1).point - pointspeeds_.at(browsingTraj).point).norm();
+  }
+  Point ab = pointspeeds_.at(browsingTraj + 1).point - pointspeeds_.at(browsingTraj).point;
+  double tGoal = t - distanceLeft / ab.norm();
+  Point goal = (Point)pointspeeds_.at(browsingTraj).point + ab * tGoal;
+  previousClosestIndex = browsingTraj;
+  return goal;
+}
+
+double Trajectory::distanceBetween(const Point &a, const Point &b) const {
+  double t1, t2;
+  size_t i1, i2;
+  Point proj1 = pointWithSpeedClosestTo(a, t1, i1);
+  Point proj2 = pointWithSpeedClosestTo(b, t2, i2);
+  if (i1 == i2) {
+    // Both projections are on the same segment
+    return proj1.distanceTo(proj2);
+  }
+  if (i1 < i2) {
+    double dist = proj1.distanceTo(pointspeeds_.at(i1 + 1).point);
+    for (size_t i = i1 + 1; i < i2; i++) {
+      dist += pointspeeds_.at(i).point.distanceTo(pointspeeds_.at(i + 1).point);
+    }
+    dist += proj2.distanceTo(pointspeeds_.at(i2).point);
+    return dist;
+  } else {
+    double dist = proj2.distanceTo(pointspeeds_.at(i2 + 1).point);
+    for (size_t i = i2 + 1; i < i1; i++) {
+      dist += pointspeeds_.at(i).point.distanceTo(pointspeeds_.at(i + 1).point);
+    }
+    dist += proj1.distanceTo(pointspeeds_.at(i1).point);
+    return dist;
+  }
+}
+
+double Trajectory::mengerCurvature(const size_t i, const double computeDistance) const {
   // bad idea... Should use the angle instead: the curvature depends on the length between considered points. Does not work for polyline
+  // Update: Actually, if we keep a specified distance to the point (before and after), it would return a curvature not depending on the distance between
+  // consecutive points
   if (pointspeeds_.size() < 2) {
     return 0.0;
   }
   if (i == 0 || i >= pointspeeds_.size() - 1) {
     return 0.0;
   }
-  const PointOriented &x = pointspeeds_.at(i - 1).point;
   const PointOriented &y = pointspeeds_.at(i).point;
-  const PointOriented &z = pointspeeds_.at(i + 1).point;
+  size_t k;
+  Point x = pointAtBackwardDistanceFrom(computeDistance, y, k, false);
+  Point z = pointAtDistanceFrom(computeDistance, y, k, false);
+  double xy = distanceBetween(x, y);
+  double yz = distanceBetween(y, z);
+
+  if (xy < computeDistance - 0.001 && xy <= yz) {
+    z = pointAtDistanceFrom(xy, y, k, false);
+    yz = distanceBetween(y, z);
+  } else if (yz < computeDistance - 0.001 && yz <= xy) {
+    x = pointAtBackwardDistanceFrom(yz, y, k, false);
+    xy = distanceBetween(x, y);
+  }
+
   if (x == y || y == z || x == z) {
     return 0.0;
   }
@@ -129,13 +190,15 @@ void Trajectory::computeSpeeds() {
   pointspeeds_.front().speed = 0.;
   pointspeeds_.back().speed = 0.;
   for (size_t i = 1; i < pointspeeds_.size() - 1; i++) {
-    const PointOriented &x = pointspeeds_.at(i - 1).point;
-    const PointOriented &y = pointspeeds_.at(i).point;
-    const PointOriented &z = pointspeeds_.at(i + 1).point;
-    const Angle &angle = (y - x).angleBetweenVectors(z - y);
-    const double a = 100. / (M_PI / 30 - M_PI / 8);  // a = max_speed / (slowing_starting_angle - stop_angle)
-    const double b = -a * M_PI / 8;                  // b = a * stop_angle
-    pointspeeds_.at(i).speed = std::min(100., std::max(0., a * angle.value() + b));
+    const double curvature = mengerCurvature(i, 20.);
+    if (curvature < 0.01) {
+      pointspeeds_.at(i).speed = 150.;  // Trajectory is straight, full speed
+    } else {
+      double centripetalAccMaxSpeed = std::sqrt(50. / curvature);  // Centripetal acceleration = v**2 * curvature
+      double maxRotSpeed = 1.8 / curvature;                        // maxRotSpeed / curvature = vx  (vtheta = vx * c)
+      double minSpeed = std::min(maxRotSpeed, centripetalAccMaxSpeed);
+      pointspeeds_.at(i).speed = std::min(150., std::max(0., minSpeed));
+    }
   }
 
   for (int i = pointspeeds_.size() - 2; i >= 0; i--) {
@@ -143,7 +206,7 @@ void Trajectory::computeSpeeds() {
     const PointOrientedSpeed &next = pointspeeds_.at(i + 1);
     const PointOrientedSpeed &current = pointspeeds_.at(i);
     const double dist = current.point.distanceTo(next.point);
-    const double maxSpeedAtMaxDecel = std::sqrt(next.speed * next.speed + 2. * 10. * dist);  // sqrt(v0**2 + 2 * maxAcc * distToTravel)
+    const double maxSpeedAtMaxDecel = std::sqrt(next.speed * next.speed + 2. * 50. * dist);  // sqrt(v0**2 + 2 * maxAcc * distToTravel)
     pointspeeds_.at(i).speed = std::min(pointspeeds_.at(i).speed, maxSpeedAtMaxDecel);
     // Speed is min between max speed due to traj angle and max possible speed to be at the next point at the right speed
   }

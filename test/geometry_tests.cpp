@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 
 #include "Navigation/Geometry/Point.h"
+#include "Navigation/Geometry/Trajectory.h"
 
 using namespace rd;
 
@@ -51,4 +52,21 @@ TEST(GeometryTest, PointOrientedTests) {
   ASSERT_FLOAT_EQ(po.y(), -3.4);
   ASSERT_FLOAT_EQ(po.theta().value(), -1.580444078461241);
   ASSERT_EQ(po.theta(), Angle(-7.863629385640827));
+}
+
+TEST(GeometryTest, TrajectoryTests) {
+  Trajectory t({{0.0, 0.0, 0.0}, {200.0, 200.0, 0.0}, {300.0, 200.0, 0.0}});
+  size_t previousI;
+  Point p = t.pointAtDistanceFrom(50., {100., 100.}, previousI);
+  ASSERT_EQ(previousI, 0);
+  ASSERT_FLOAT_EQ(p.x(), 135.35535);
+  ASSERT_FLOAT_EQ(p.y(), 135.35535);
+  p = t.pointAtBackwardDistanceFrom(50., {100.0, 100.0}, previousI);
+  ASSERT_EQ(previousI, 0);
+  ASSERT_FLOAT_EQ(p.x(), 64.644661);
+  ASSERT_FLOAT_EQ(p.y(), 64.644661);
+  p = t.pointAtDistanceFrom(40., {198.0, 198.0}, previousI);
+  ASSERT_EQ(previousI, 1);
+  p = t.pointAtBackwardDistanceFrom(50., {205.0, 200.0}, previousI);
+  ASSERT_EQ(previousI, 0);
 }

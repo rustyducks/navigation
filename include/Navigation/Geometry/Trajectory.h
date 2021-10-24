@@ -48,9 +48,14 @@ class Trajectory {
    * @param pointStart the starting point (will be projected on the trajectory)
    * @return Point the point on the trajectory at a distance from the projection of pointStart on the trajectory, along with an interpolated speed
    */
-  Point pointAtDistanceFrom(const double distance, const Point &pointStart, size_t &previousClosestIndex);
+  Point pointAtDistanceFrom(const double distance, const Point &pointStart, size_t &previousClosestIndex, bool withSpeed = true) const;
+  Point pointAtBackwardDistanceFrom(const double distance, const Point &pointStart, size_t &previousClosestIndex, bool withSpeed = true) const;
 
-  double mengerCurvature(const size_t i) const;
+  /* Returns the trajectory length between the projection of a and the projection of b along the trajectory.
+   */
+  double distanceBetween(const Point &a, const Point &b) const;
+
+  double mengerCurvature(const size_t i, const double distance) const;
 
   void pop() { pointspeeds_.pop_front(); };
   const PointOrientedSpeed &at(size_t i) const;
