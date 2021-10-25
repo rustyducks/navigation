@@ -55,7 +55,7 @@ TEST(GeometryTest, PointOrientedTests) {
 }
 
 TEST(GeometryTest, TrajectoryTests) {
-  Trajectory t({{0.0, 0.0, 0.0}, {200.0, 200.0, 0.0}, {300.0, 200.0, 0.0}});
+  Path t({{0.0, 0.0, 0.0}, {200.0, 200.0, 0.0}, {300.0, 200.0, 0.0}});
   size_t previousI;
   Point p = t.pointAtDistanceFrom(50., {100., 100.}, previousI);
   ASSERT_EQ(previousI, 0);

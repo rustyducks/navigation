@@ -22,12 +22,12 @@ Ivy::~Ivy() {
   ivyThread_.join();
 }
 
-void Ivy::sendTrajectory(const Trajectory& trajectory) const {
+void Ivy::sendPath(const Path& path) const {
   std::ostringstream oss;
   oss << "New trajectory ";
-  for (size_t i = 0; i < trajectory.size(); i++) {
-    oss << trajectory.at(i).point.x() << "," << trajectory.at(i).point.y();
-    if (i < trajectory.size() - 1) {
+  for (size_t i = 0; i < path.size(); i++) {
+    oss << path.at(i).x() << "," << path.at(i).y();
+    if (i < path.size() - 1) {
       oss << ";";
     }
   }

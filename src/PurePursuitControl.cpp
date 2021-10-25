@@ -14,7 +14,7 @@ Speed PurePursuitControl::computeSpeed(const PointOriented& robotPose, const Spe
       break;
     case PurePursuitState::FIRST_ROTATION:
 
-      targetAngle = robotPose.angleTo(trajectory_.at(1).point);  // trajectory.at(0) is past point, in order for the interpolation to work
+      targetAngle = robotPose.angleTo(trajectory_.at(1));  // trajectory.at(0) is past point, in order for the interpolation to work
       if (std::abs(robotSpeed.vtheta()) <= 0.01 && std::abs((targetAngle - robotPose.theta()).value()) < ADMITTED_ANGLE_POSITION_ERROR) {
         state_ = PurePursuitState::CRUISING;
         return cruising(robotPose, robotSpeed, dt);
@@ -29,7 +29,7 @@ Speed PurePursuitControl::computeSpeed(const PointOriented& robotPose, const Spe
       return cruising(robotPose, robotSpeed, dt);
       break;
     case PurePursuitState::LAST_ROTATION:
-      if (std::abs(robotSpeed.vtheta()) <= 0.01 && std::abs((trajectory_.at(0).point.theta() - robotPose.theta()).value()) < ADMITTED_ANGLE_POSITION_ERROR) {
+      if (std::abs(robotSpeed.vtheta()) <= 0.01 && std::abs((trajectory_.at(0).theta() - robotPose.theta()).value()) < ADMITTED_ANGLE_POSITION_ERROR) {
         trajectory_.pop();
         assert(trajectory_.size() == 0);
         state_ = PurePursuitState::IDLE;
@@ -46,8 +46,8 @@ Speed PurePursuitControl::computeSpeed(const PointOriented& robotPose, const Spe
 }
 
 Speed PurePursuitControl::cruising(const PointOriented& robotPose, const Speed& robotSpeed, double dt) {
-  PointOriented nextTrajPoint = trajectory_.at(trajectoryCurrentIndex_).point;  // trajectory.at(0) is past point, in order for the interpolation to work
-  double nextTrajSpeed = trajectory_.at(trajectoryCurrentIndex_).speed;
+  PointOriented nextTrajPoint = trajectory_.at(trajectoryCurrentIndex_);  // trajectory.at(0) is past point, in order for the interpolation to work
+  double nextTrajSpeed = trajectory_.at(trajectoryCurrentIndex_).speed();
   double positionError = robotPose.distanceTo(nextTrajPoint);
   Ivy::getInstance().sendPoint(5, nextTrajPoint);
   if (positionError < ADMITTED_LINEAR_POSITION_ERROR) {
@@ -68,7 +68,7 @@ Speed PurePursuitControl::cruising(const PointOriented& robotPose, const Speed& 
       }
       trajectoryCurrentIndex_ = 1;
       state_ = PurePursuitState::FIRST_ROTATION;
-      Angle targetAngle = robotPose.angleTo(trajectory_.at(1).point);
+      Angle targetAngle = robotPose.angleTo(trajectory_.at(1));
       rotationControl_.setTargetAngle(targetAngle);
       return rotationControl_.computeSpeed(robotPose, robotSpeed, dt);
     } else {
@@ -85,14 +85,18 @@ Speed PurePursuitControl::cruising(const PointOriented& robotPose, const Speed& 
 }
 
 Speed PurePursuitControl::purePursuit(const PointOriented& robotPose, const Speed& robotSpeed, double dt) {
+  Ivy& ivy = Ivy::getInstance();
   size_t nextClosestIndex;
-  trajectory_.pointAtDistanceFrom(0, robotPose, nextClosestIndex);
+  trajectory_.pointWithSpeedAtDistanceFrom(0, robotPose, nextClosestIndex);
   linearControl_.setTargetPoint(trajectory_.at(nextClosestIndex + 1));
   Speed linear = linearControl_.computeSpeed(robotPose, robotSpeed, dt);
+  // std::cout << "linear Speed: " << linear << std::endl;
   double vx = linear.linearSpeed();  // Only the magnitude of the speed interest us, the rest is handled via steering
+                                     // double vx = 100;
   size_t previousClosestIndex;
-  Point goal = trajectory_.pointAtDistanceFrom(PURE_PURSUIT_LOOKAHEAD_DISTANCE, robotPose, previousClosestIndex);
+  Point goal = trajectory_.pointWithSpeedAtDistanceFrom(PURE_PURSUIT_LOOKAHEAD_DISTANCE, robotPose, previousClosestIndex);
   trajectoryCurrentIndex_ = previousClosestIndex + 1;
+  ivy.sendPoint(1, goal);
   Point robot2Goal = goal.transformIn(robotPose);
   double curvature = 2 * robot2Goal.y() / robot2Goal.squaredNorm();
   double vtheta = vx * curvature;

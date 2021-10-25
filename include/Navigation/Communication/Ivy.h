@@ -13,7 +13,7 @@ class Ivy {
     return instance;
   }
 
-  void sendTrajectory(const Trajectory& trajectory) const;
+  void sendPath(const Path& path) const;
   void sendPoint(const size_t id, const Point& point) const;
   void sendRobotPose(const PointOriented& robotPose) const;
 
