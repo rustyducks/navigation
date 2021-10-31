@@ -4,8 +4,8 @@
 #include <string>
 #include <unordered_map>
 
-#include "Navigation/Geometry/Point.h"
-#include "Navigation/Geometry/Speed.h"
+#include "GeometryTools/Point.h"
+#include "GeometryTools/Speed.h"
 
 namespace rd {
 class PositionControlBase {

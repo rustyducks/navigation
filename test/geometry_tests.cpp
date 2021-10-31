@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 
-#include "Navigation/Geometry/Point.h"
-#include "Navigation/Geometry/Trajectory.h"
+#include "GeometryTools/Point.h"
+#include "GeometryTools/Trajectory.h"
 
 using namespace rd;
 

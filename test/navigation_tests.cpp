@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 
 #include <iostream>
+#include <random>
 
 #include "Navigation/Communication/Ivy.h"
 #include "Navigation/Parameters.h"
@@ -11,8 +12,12 @@
 using namespace rd;
 
 void simulate(PointOriented& robotPose, const Speed& speed, double dt) {
-  robotPose += PointOriented(speed.vx() * robotPose.theta().cos() * dt - speed.vy() * robotPose.theta().sin() * dt,
-                             speed.vx() * robotPose.theta().sin() * dt + speed.vy() * robotPose.theta().cos() * dt, speed.vtheta() * dt);
+  std::default_random_engine generator;
+  double vxNoise = speed.vx() < 1. ? 0. : std::normal_distribution<double>(0.0, 7.5)(generator);
+  double vthetaNoise = std::normal_distribution<double>(0.0, 0.003)(generator);
+  robotPose +=
+      PointOriented((speed.vx() + vxNoise) * robotPose.theta().cos() * dt - speed.vy() * robotPose.theta().sin() * dt,
+                    (speed.vx() + vxNoise) * robotPose.theta().sin() * dt + speed.vy() * robotPose.theta().cos() * dt, (speed.vtheta() + vthetaNoise) * dt);
 }
 
 class RotationControlTest : public ::testing::Test {
@@ -80,6 +85,9 @@ TEST_F(PurePursuitControlTest, Control) {
   Trajectory traj2 = Path::lissajouPath(robotPose, 200).computeSpeeds();
   ivy.sendPath(traj2);
   pp_.setTrajectory(traj2);
+  for (size_t i = 0; i < traj2.size(); i++) {
+    std::cout << traj2.at(i).speed() << std::endl;
+  }
   for (size_t i = 0; i < 2000; i++) {
     robotSpeed = pp_.computeSpeed(robotPose, robotSpeed, dt);
     simulate(robotPose, robotSpeed, dt);

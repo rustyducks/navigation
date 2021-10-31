@@ -1,7 +1,7 @@
 #ifndef PUREPURSUITCONTROL_H
 #define PUREPURSUITCONTROL_H
 
-#include "Navigation/Geometry/Trajectory.h"
+#include "GeometryTools/Trajectory.h"
 #include "Navigation/LinearControl.h"
 #include "Navigation/PositionControlBase.h"
 #include "Navigation/RotationControl.h"

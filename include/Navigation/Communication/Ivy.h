@@ -2,8 +2,8 @@
 #define RD_IVY_H
 #include <thread>
 
-#include "Navigation/Geometry/Point.h"
-#include "Navigation/Geometry/Trajectory.h"
+#include "GeometryTools/Point.h"
+#include "GeometryTools/Trajectory.h"
 
 namespace rd {
 class Ivy {

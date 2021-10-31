@@ -17,26 +17,29 @@ project(navigation VERSION 0.1.0)
 add_compile_options(-Wall -Wextra -pedantic -Werror)
 set (CMAKE_CXX_STANDARD 11)
 
-find_package(Eigen3 REQUIRED)
-
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/")
-find_package(Ivy REQUIRED)
+if (NOT CMAKE_CROSSCOMPILING)
+    find_package(Ivy REQUIRED)
+endif()
+find_package(GeometryTools REQUIRED)
 
-
-include_directories(
-    include
-    ${Eigen3_INCLUDE_DIRS}
-    ${Ivy_INCLUDE_DIRS}
-)
-
-add_library(geometry_tools src/Geometry/Point.cpp src/Geometry/Trajectory.cpp src/Geometry/Speed.cpp)
+if (CMAKE_CROSSCOMPILING)
+    include_directories(
+        include
+    )
+else()
+    include_directories(
+        include
+        ${Ivy_INCLUDE_DIRS}
+    )
+endif()
 
 add_library(navigation src/PurePursuitControl.cpp src/RotationControl.cpp src/LinearControl.cpp)
-target_link_libraries(navigation geometry_tools)
+target_link_libraries(navigation GeometryTools::GeometryTools)
 
 
 
-if(NOT CMAKE_CROSSCOMPILING AND ENABLE_TESTS)
+if((NOT CMAKE_CROSSCOMPILING) AND ENABLE_TESTS)
     include(FetchContent)
     FetchContent_Declare(
       googletest
@@ -53,11 +56,11 @@ if(NOT CMAKE_CROSSCOMPILING AND ENABLE_TESTS)
     target_link_libraries(
     geometry_tests
     gtest_main
-    geometry_tools
+    GeometryTools::GeometryTools
     )
     
     add_executable(navigation_tests test/navigation_tests.cpp src/Communication/Ivy.cpp)
-    target_link_libraries(navigation_tests gtest_main navigation geometry_tools ${Ivy_LIBRARY_OPTIMIZED})
+    target_link_libraries(navigation_tests gtest_main navigation ${Ivy_LIBRARY_OPTIMIZED} GeometryTools::GeometryTools)
     include(GoogleTest)
     gtest_discover_tests(geometry_tests)
     gtest_discover_tests(navigation_tests)

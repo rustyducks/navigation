@@ -1,7 +1,7 @@
 #ifndef LINEARCONTROL_H
 #define LINEARCONTROL_H
 
-#include "Navigation/Geometry/Trajectory.h"
+#include "GeometryTools/Trajectory.h"
 #include "Navigation/PositionControlBase.h"
 
 namespace rd {

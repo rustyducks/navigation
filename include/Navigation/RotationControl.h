@@ -1,7 +1,7 @@
 #ifndef ROTATIONCONTROL_H
 #define ROTATIONCONTROL_H
 
-#include "Navigation/Geometry/Point.h"
+#include "GeometryTools/Point.h"
 #include "Navigation/PositionControlBase.h"
 namespace rd {
 class RotationControl : public PositionControlBase {
