@@ -30,14 +30,18 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(GeometryTools)
 
-add_library(Navigation STATIC src/PurePursuitControl.cpp src/RotationControl.cpp src/LinearControl.cpp)
-target_link_libraries(Navigation PUBLIC GeometryTools)
+set(THREADS_PREFER_PTHREAD_FLAG ON)
+find_package(Threads REQUIRED)
+
+add_library(Navigation STATIC src/PurePursuitControl.cpp src/RotationControl.cpp src/LinearControl.cpp src/Communication/Ivy.cpp)
+target_link_libraries(Navigation PUBLIC GeometryTools ${Ivy_LIBRARY_OPTIMIZED})
+target_link_libraries(Navigation PRIVATE Threads::Threads)
 target_include_directories(Navigation PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>  
     $<INSTALL_INTERFACE:include>
 )
 set_target_properties(Navigation PROPERTIES PUBLIC_HEADER 
-"include/Navigation/LinearControl.h;include/Navigation/Parameters.h;include/Navigation/PositionControlBase.h;include/Navigation/PurePursuitControl.h;include/Navigation/RotationControl.h")
+"include/Navigation/LinearControl.h;include/Navigation/Parameters.h;include/Navigation/PositionControlBase.h;include/Navigation/PurePursuitControl.h;include/Navigation/RotationControl.h;include/Navigation/Communication/Ivy.h")
 
 
 
@@ -62,8 +66,8 @@ if((NOT CMAKE_CROSSCOMPILING) AND ENABLE_TESTS)
     GeometryTools
     )
     
-    add_executable(navigation_tests test/navigation_tests.cpp src/Communication/Ivy.cpp)
-    target_link_libraries(navigation_tests gtest_main Navigation ${Ivy_LIBRARY_OPTIMIZED} GeometryTools)
+    add_executable(navigation_tests test/navigation_tests.cpp)
+    target_link_libraries(navigation_tests gtest_main Navigation GeometryTools)
     include(GoogleTest)
     gtest_discover_tests(geometry_tests)
     gtest_discover_tests(navigation_tests)
