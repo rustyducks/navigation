@@ -85,8 +85,9 @@ TEST_F(PurePursuitControlTest, Control) {
   PointOriented robotPose(600.0, 730.0, 0.5);
   Speed robotSpeed(0.0, 0.0, 0.0);
   double dt = 0.1;
-  Trajectory traj = Path({{600.0, 730.0, 0.5}, {1500.0, 900.0, 0.0}, {1600.0, 1000.0, 0.0}}).computeSpeeds();
-  Trajectory traj2 = Path::lissajouPath(robotPose, 200).computeSpeeds();
+  Trajectory traj = Path({{600.0, 730.0, 0.5}, {1500.0, 900.0, 0.0}, {1600.0, 1000.0, 0.0}})
+                        .computeSpeeds(params.maxLinearSpeed, params.maxRotationalSpeed, 50., params.maxLinearAcceleration);
+  Trajectory traj2 = Path::lissajouPath(robotPose, 200).computeSpeeds(params.maxLinearSpeed, params.maxRotationalSpeed, 50., params.maxLinearAcceleration);
   ivy.sendPath(traj2);
   pp_.setTrajectory(traj2);
   for (size_t i = 0; i < traj2.size(); i++) {
@@ -97,7 +98,7 @@ TEST_F(PurePursuitControlTest, Control) {
     simulate(robotPose, robotSpeed, dt);
     ivy.sendRobotPose(robotPose);
     // std::cout << robotPose << "  " << robotSpeed << std::endl;
-    //  usleep(dt * 1000000);
+    usleep(dt * 1000000);
     ASSERT_LE(robotSpeed.vx(), MAX_LINEAR_SPEED);
     if (pp_.isGoalReached()) {
       break;
