@@ -20,9 +20,13 @@ void simulate(PointOriented& robotPose, const Speed& speed, double dt) {
                     (speed.vx() + vxNoise) * robotPose.theta().sin() * dt + speed.vy() * robotPose.theta().cos() * dt, (speed.vtheta() + vthetaNoise) * dt);
 }
 
+PositionControlParameters params = {
+    50., 200., 0.5, 1.8, 5., 0.05,
+};
+
 class RotationControlTest : public ::testing::Test {
  protected:
-  RotationControlTest() : ::testing::Test() {}
+  RotationControlTest() : ::testing::Test(), rc_(params) {}
   void SetUp() override{};
   RotationControl rc_;
 };
@@ -71,7 +75,7 @@ TEST_F(RotationControlTest, Control) {
 
 class PurePursuitControlTest : public ::testing::Test {
  protected:
-  PurePursuitControlTest() : ::testing::Test() {}
+  PurePursuitControlTest() : ::testing::Test(), pp_(params, 3, 50.) {}
   void SetUp() override{};
   PurePursuitControl pp_;
 };

@@ -6,7 +6,7 @@
 namespace rd {
 class RotationControl : public PositionControlBase {
  public:
-  RotationControl();
+  RotationControl(const PositionControlParameters &params);
   ~RotationControl() = default;
 
   virtual Speed computeSpeed(const PointOriented &robotPose, const Speed &robotSpeed, double dt) override;

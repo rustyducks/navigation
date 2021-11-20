@@ -9,7 +9,8 @@
 namespace rd {
 class PurePursuitControl : public PositionControlBase {
  public:
-  PurePursuitControl();
+  PurePursuitControl(const PositionControlParameters& params, int linearControlStopDistanceFactor = LINEAR_CONTROL_STOP_DISTANCE_FACTOR,
+                     double lookaheadDistance = PURE_PURSUIT_LOOKAHEAD_DISTANCE);
   ~PurePursuitControl() = default;
 
   virtual Speed computeSpeed(const PointOriented& robotPose, const Speed& robotSpeed, double dt) override;
@@ -34,6 +35,8 @@ class PurePursuitControl : public PositionControlBase {
   LinearControl linearControl_;
   size_t trajectoryCurrentIndex_;
   bool isGoalReached_;
+
+  const double lookaheadDistance_;
 };
 
 }  // namespace rd

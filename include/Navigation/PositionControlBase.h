@@ -6,11 +6,16 @@
 
 #include "GeometryTools/Point.h"
 #include "GeometryTools/Speed.h"
+#include "Navigation/Parameters.h"
 
 namespace rd {
 class PositionControlBase {
  public:
+  PositionControlBase(const PositionControlParameters params) : params_(params) {}
   virtual Speed computeSpeed(const PointOriented& robotPose, const Speed& robotSpeed, double dt) = 0;
+
+ protected:
+  const PositionControlParameters params_;
 };
 }  // namespace rd
 

@@ -15,7 +15,7 @@ endif()
 project(navigation VERSION 0.1.0)
 
 add_compile_options(-Wall -Wextra -pedantic -Werror)
-set (CMAKE_CXX_STANDARD 11)
+set (CMAKE_CXX_STANDARD 14)
 
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/")
 if (NOT CMAKE_CROSSCOMPILING)
