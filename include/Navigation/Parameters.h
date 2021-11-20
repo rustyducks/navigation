@@ -13,6 +13,7 @@
 
 #define PURE_PURSUIT_LOOKAHEAD_DISTANCE 50.  // mm
 
+namespace rd {
 struct PositionControlParameters {
   double maxLinearAcceleration = MAX_LINEAR_ACCELERATION;
   double maxLinearSpeed = MAX_LINEAR_SPEED;
@@ -21,5 +22,5 @@ struct PositionControlParameters {
   double admittedLinearPositionError = ADMITTED_LINEAR_POSITION_ERROR;
   double admittedAnglePositionError = ADMITTED_ANGLE_POSITION_ERROR;
 };
-
+}  // namespace rd
 #endif /* PARAMETERS_H */

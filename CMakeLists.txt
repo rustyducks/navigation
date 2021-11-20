@@ -12,7 +12,7 @@ if(CROSSCOMPILE_ARM)
     set(CMAKE_TOOLCHAIN_FILE ${CMAKE_CURRENT_SOURCE_DIR}/arm_build.cmake)
 endif()
 
-project(navigation VERSION 0.1.0)
+project(navigation VERSION 0.2.0)
 
 add_compile_options(-Wall -Wextra -pedantic -Werror)
 set (CMAKE_CXX_STANDARD 14)
