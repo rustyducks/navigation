@@ -11,6 +11,7 @@ class LinearControl : public PositionControlBase {
   ~LinearControl() = default;
   virtual Speed computeSpeed(const PointOriented& robotPose, const Speed& robotSpeed, double dt) override;
   inline void setTargetPoint(const PointOrientedSpeed& target) { targetPoint_ = target; };
+  bool isGoalReached() const override { throw std::runtime_error("Not implemented"); }
 
  protected:
   PointOrientedSpeed targetPoint_;

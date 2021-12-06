@@ -21,7 +21,7 @@ class PurePursuitControl : public PositionControlBase {
     isGoalReached_ = false;
   };
   const Trajectory& getTrajectory() const { return trajectory_; }
-  bool isGoalReached() const { return isGoalReached_; }
+  bool isGoalReached() const override { return isGoalReached_; }
 
  protected:
   enum PurePursuitState { IDLE, FIRST_ROTATION, CRUISING, LAST_ROTATION };

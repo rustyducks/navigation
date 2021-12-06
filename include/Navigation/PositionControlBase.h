@@ -13,6 +13,7 @@ class PositionControlBase {
  public:
   PositionControlBase(const PositionControlParameters params) : params_(params) {}
   virtual Speed computeSpeed(const PointOriented& robotPose, const Speed& robotSpeed, double dt) = 0;
+  virtual bool isGoalReached() const = 0;
 
  protected:
   const PositionControlParameters params_;
