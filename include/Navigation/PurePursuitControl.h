@@ -18,16 +18,17 @@ class PurePursuitControl : public PositionControlBase {
     trajectory_ = trajectory;
     trajectoryCurrentIndex_ = 1;
     state_ = FIRST_ROTATION;
+    rotationAngleToSet_ = true;
     isGoalReached_ = false;
   };
   const Trajectory& getTrajectory() const { return trajectory_; }
   bool isGoalReached() const override { return isGoalReached_; }
 
  protected:
-  enum PurePursuitState { IDLE, FIRST_ROTATION, CRUISING, LAST_ROTATION };
+  enum PurePursuitState { IDLE, FIRST_ROTATION, ACCELERATE, CRUISING, DECELERATE, LAST_ROTATION };
 
   Speed cruising(const PointOriented& robotPose, const Speed& robotSpeed, double dt);
-  Speed purePursuit(const PointOriented& robotPose, const Speed& robotSpeed, double dt);
+  Speed purePursuit(const PointOriented& robotPose, const double linearSpeed, double dt);
 
   PurePursuitState state_;
   Trajectory trajectory_;
@@ -35,6 +36,7 @@ class PurePursuitControl : public PositionControlBase {
   LinearControl linearControl_;
   size_t trajectoryCurrentIndex_;
   bool isGoalReached_;
+  bool rotationAngleToSet_;
 
   const double lookaheadDistance_;
 };
