@@ -2,6 +2,6 @@ include(CMakeFindDependencyMacro)
 
 # Same syntax as find_package
 find_dependency(Eigen3 REQUIRED)
+find_dependency(Threads REQUIRED)
 
-# Add the targets file
-include("${CMAKE_CURRENT_LIST_DIR}/GeometryToolsTargets.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/NavigationTargets.cmake")

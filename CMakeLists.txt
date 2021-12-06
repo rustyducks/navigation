@@ -13,6 +13,8 @@ if(CROSSCOMPILE_ARM)
 endif()
 
 project(navigation VERSION 0.2.0)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 
 add_compile_options(-Wall -Wextra -pedantic -Werror)
 set (CMAKE_CXX_STANDARD 14)
@@ -23,19 +25,23 @@ if (NOT CMAKE_CROSSCOMPILING)
 endif()
 
 include(FetchContent)
-FetchContent_Declare(
-  GeometryTools
-  GIT_REPOSITORY https://github.com/rustyducks/geometry_tools.git
-  GIT_TAG main
-)
-FetchContent_MakeAvailable(GeometryTools)
+find_package(GeometryTools)
+if (NOT ${GeometryTools_FOUND})
+    message("'GeometryTools' not found installed locally, retrieving it from Github")
+    FetchContent_Declare(
+    GeometryTools
+    GIT_REPOSITORY https://github.com/rustyducks/geometry_tools.git
+    GIT_TAG main
+    )
+    FetchContent_MakeAvailable(GeometryTools)
+endif()
 
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
 
 add_library(Navigation STATIC src/PurePursuitControl.cpp src/RotationControl.cpp src/LinearControl.cpp src/Communication/Ivy.cpp)
 target_link_libraries(Navigation PUBLIC GeometryTools ${Ivy_LIBRARY_OPTIMIZED})
-target_link_libraries(Navigation PRIVATE Threads::Threads)
+target_link_libraries(Navigation PUBLIC Threads::Threads)
 target_include_directories(Navigation PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>  
     $<INSTALL_INTERFACE:include>
@@ -85,9 +91,11 @@ install(TARGETS Navigation
         LIBRARY DESTINATION lib
         ARCHIVE DESTINATION lib
         INCLUDES DESTINATION include
-        PUBLIC_HEADER DESTINATION include/Navigation
-
 )
+install (
+    DIRECTORY ${CMAKE_SOURCE_DIR}/include/
+    DESTINATION include
+    FILES_MATCHING PATTERN "*.h*")
 
 include(CMakePackageConfigHelpers)
 write_basic_package_version_file(
@@ -98,7 +106,6 @@ write_basic_package_version_file(
 
 install(EXPORT NavigationTargets
         FILE NavigationTargets.cmake
-        NAMESPACE Navigation::
         DESTINATION lib/cmake/Navigation
 )
 
