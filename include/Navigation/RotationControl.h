@@ -10,10 +10,14 @@ class RotationControl : public PositionControlBase {
   ~RotationControl() = default;
 
   virtual Speed computeSpeed(const PointOriented &robotPose, const Speed &robotSpeed, double dt) override;
-  void setTargetAngle(const Angle &angle) { targetAngle_ = angle; };  // In map frame (absolute)
+  void setTargetAngle(const Angle &angle);  // In map frame (absolute)
   bool isGoalReached() const override { return isGoalReached_; }
 
  protected:
+  enum eRotationControlState { ACCELERATE, CRUISING, DECELERATE };
+  eRotationControlState state_;
+  bool isGoalReached_;
+
   Angle targetAngle_;  // In map frame (absolute)
 };
 
