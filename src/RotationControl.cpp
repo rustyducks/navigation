@@ -21,7 +21,7 @@ Speed RotationControl::computeSpeed(const PointOriented &robotPose, const Speed 
       rotationSpeed = std::min(params_.maxRotationalSpeed, std::max(-params_.maxRotationalSpeed, rotationSpeed));
     }
     angleToStop = 0.5 * robotSpeed.vtheta() * robotSpeed.vtheta() / params_.maxRotationalAcceleration;
-    if (angleToStop + dt * robotSpeed.vtheta() >= std::abs(diff.value())) {
+    if (angleToStop + dt * std::abs(rotationSpeed) >= std::abs(diff.value())) {
       state_ = eRotationControlState::DECELERATE;
     }
   }
@@ -32,7 +32,7 @@ Speed RotationControl::computeSpeed(const PointOriented &robotPose, const Speed 
       rotationSpeed = params_.maxRotationalSpeed;
     }
     angleToStop = 0.5 * robotSpeed.vtheta() * robotSpeed.vtheta() / params_.maxRotationalAcceleration;
-    if (angleToStop + dt * robotSpeed.vtheta() >= std::abs(diff.value())) {
+    if (angleToStop + dt * std::abs(robotSpeed.vtheta()) >= std::abs(diff.value())) {
       state_ = eRotationControlState::DECELERATE;
     }
   }

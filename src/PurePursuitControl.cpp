@@ -65,7 +65,7 @@ Speed PurePursuitControl::cruising(const PointOriented& robotPose, const Speed& 
       vx = params_.maxLinearSpeed;
     }
     lengthToStop = 0.5 * robotSpeed.vx() * robotSpeed.vx() / params_.maxLinearAcceleration;
-    if (lengthToStop + dt * robotSpeed.vx() >= trajectory_.distanceBetween(robotPose, trajectory_.last())) {
+    if (lengthToStop + dt * vx >= trajectory_.distanceBetween(robotPose, trajectory_.last())) {
       state_ = PurePursuitState::DECELERATE;
     }
   }
