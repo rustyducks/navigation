@@ -1,6 +1,6 @@
 #include "Navigation/PurePursuitControl.h"
 
-#include "Navigation/Communication/Ivy.h"
+// #include "Navigation/Communication/Ivy.h"
 #include "Navigation/Parameters.h"
 
 namespace rd {
@@ -81,7 +81,7 @@ Speed PurePursuitControl::cruising(const PointOriented& robotPose, const Speed& 
   }
 
   PointOriented nextTrajPoint = trajectory_.at(trajectoryCurrentIndex_);  // trajectory.at(0) is past point, in order for the interpolation to work
-  Ivy::getInstance().sendPoint(5, nextTrajPoint);
+  // Ivy::getInstance().sendPoint(5, nextTrajPoint);
 
   // double nextTrajSpeed = trajectory_.at(trajectoryCurrentIndex_).speed();
   double positionError = robotPose.distanceTo(nextTrajPoint);
@@ -120,7 +120,7 @@ Speed PurePursuitControl::cruising(const PointOriented& robotPose, const Speed& 
 }
 
 Speed PurePursuitControl::purePursuit(const PointOriented& robotPose, const double linearSpeed, double) {
-  Ivy& ivy = Ivy::getInstance();
+  // Ivy& ivy = Ivy::getInstance();
   size_t nextClosestIndex;
   trajectory_.pointWithSpeedAtDistanceFrom(0, robotPose, nextClosestIndex);
   // linearControl_.setTargetPoint(trajectory_.at(nextClosestIndex + 1));
@@ -136,7 +136,7 @@ Speed PurePursuitControl::purePursuit(const PointOriented& robotPose, const doub
   size_t previousClosestIndex;
   Point goal = trajectory_.pointWithSpeedAtDistanceFrom(lookaheadDistance_, robotPose, previousClosestIndex);
   trajectoryCurrentIndex_ = previousClosestIndex + 1;
-  ivy.sendPoint(1, goal);
+  // ivy.sendPoint(1, goal);
   Point robot2Goal = goal.transformIn(robotPose);
   double curvature = 2 * robot2Goal.y() / robot2Goal.squaredNorm();
   double vtheta = vx * curvature;

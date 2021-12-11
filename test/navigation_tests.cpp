@@ -2,7 +2,6 @@
 
 #include <iostream>
 
-#include "Navigation/Communication/Ivy.h"
 #include "Navigation/Parameters.h"
 #include "Navigation/PositionControlBase.h"
 #include "Navigation/PurePursuitControl.h"
@@ -74,7 +73,6 @@ class PurePursuitControlTest : public ::testing::Test {
 };
 
 TEST_F(PurePursuitControlTest, Control) {
-  Ivy& ivy = Ivy::getInstance();
   PointOriented robotPose(600.0, 730.0, 0.5);
   Speed robotSpeed(0.0, 0.0, 0.0);
   double dt = 0.1;
@@ -82,7 +80,6 @@ TEST_F(PurePursuitControlTest, Control) {
                         .computeSpeeds(params.maxLinearSpeed, params.maxRotationalSpeed, 50., params.maxLinearAcceleration);
   Trajectory traj2 =
       Path::lissajouPath(robotPose, 200, 750, 500).computeSpeeds(params.maxLinearSpeed, params.maxRotationalSpeed, 50., params.maxLinearAcceleration);
-  ivy.sendPath(traj2);
   pp_.setTrajectory(traj2);
   for (size_t i = 0; i < traj2.size(); i++) {
     // std::cout << traj2.at(i).speed() << std::endl;
@@ -90,7 +87,6 @@ TEST_F(PurePursuitControlTest, Control) {
   for (size_t i = 0; i < 2000; i++) {
     robotSpeed = pp_.computeSpeed(robotPose, robotSpeed, dt);
     simulate(robotPose, robotSpeed, dt);
-    ivy.sendRobotPose(robotPose);
     // std::cout << robotPose << "  " << robotSpeed << std::endl;
     // usleep(dt * 1000000);
     ASSERT_LE(robotSpeed.vx(), MAX_LINEAR_SPEED);

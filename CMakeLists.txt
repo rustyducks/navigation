@@ -20,9 +20,6 @@ add_compile_options(-Wall -Wextra -pedantic -Werror)
 set (CMAKE_CXX_STANDARD 14)
 
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/")
-if (NOT CMAKE_CROSSCOMPILING)
-    find_package(Ivy REQUIRED)
-endif()
 
 include(FetchContent)
 find_package(GeometryTools)
@@ -39,15 +36,15 @@ endif()
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
 
-add_library(Navigation STATIC src/PurePursuitControl.cpp src/RotationControl.cpp src/LinearControl.cpp src/Communication/Ivy.cpp)
-target_link_libraries(Navigation PUBLIC GeometryTools ${Ivy_LIBRARY_OPTIMIZED})
+add_library(Navigation STATIC src/PurePursuitControl.cpp src/RotationControl.cpp src/LinearControl.cpp)
+target_link_libraries(Navigation PUBLIC GeometryTools)
 target_link_libraries(Navigation PUBLIC Threads::Threads)
 target_include_directories(Navigation PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>  
     $<INSTALL_INTERFACE:include>
 )
 set_target_properties(Navigation PROPERTIES PUBLIC_HEADER 
-"include/Navigation/LinearControl.h;include/Navigation/Parameters.h;include/Navigation/PositionControlBase.h;include/Navigation/PurePursuitControl.h;include/Navigation/RotationControl.h;include/Navigation/Communication/Ivy.h")
+"include/Navigation/LinearControl.h;include/Navigation/Parameters.h;include/Navigation/PositionControlBase.h;include/Navigation/PurePursuitControl.h;include/Navigation/RotationControl.h")
 
 
 
