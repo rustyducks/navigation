@@ -7,7 +7,7 @@ namespace rd {
 LinearControl::LinearControl(const PositionControlParameters& params, int stopDistanceFactor)
     : PositionControlBase(params), stopDistanceFactor_(stopDistanceFactor) {}
 
-Speed LinearControl::computeSpeed(const PointOriented& robotPose, const Speed& robotSpeed, double dt) {
+Speed LinearControl::computeSpeed(const PointOriented& robotPose, const Speed& robotSpeed, double dt, double) {
   Point rp = targetPoint_ - robotPose;
   Point robotHeading(robotPose.theta().cos(), robotPose.theta().sin());
   double robotLSpeed = robotSpeed.linearSpeed();

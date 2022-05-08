@@ -9,7 +9,7 @@ class RotationControl : public PositionControlBase {
   RotationControl(const PositionControlParameters &params);
   ~RotationControl() = default;
 
-  virtual Speed computeSpeed(const PointOriented &robotPose, const Speed &robotSpeed, double dt) override;
+  virtual Speed computeSpeed(const PointOriented &robotPose, const Speed &robotSpeed, double dt, double maxSpeed) override;
   void setTargetAngle(const Angle &angle);  // In map frame (absolute)
   bool isGoalReached() const override { return isGoalReached_; }
 

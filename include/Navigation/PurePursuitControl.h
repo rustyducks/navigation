@@ -13,7 +13,7 @@ class PurePursuitControl : public PositionControlBase {
                      double lookaheadDistance = PURE_PURSUIT_LOOKAHEAD_DISTANCE);
   ~PurePursuitControl() = default;
 
-  virtual Speed computeSpeed(const PointOriented& robotPose, const Speed& robotSpeed, double dt) override;
+  virtual Speed computeSpeed(const PointOriented& robotPose, const Speed& robotSpeed, double dt, double maxSpeed) override;
   void setTrajectory(const Trajectory& trajectory) {
     trajectory_ = trajectory;
     trajectoryCurrentIndex_ = 1;
@@ -27,8 +27,8 @@ class PurePursuitControl : public PositionControlBase {
  protected:
   enum PurePursuitState { IDLE, FIRST_ROTATION, ACCELERATE, CRUISING, DECELERATE, LAST_ROTATION };
 
-  Speed cruising(const PointOriented& robotPose, const Speed& robotSpeed, double dt);
-  Speed purePursuit(const PointOriented& robotPose, const double linearSpeed, double dt);
+  Speed cruising(const PointOriented& robotPose, const Speed& robotSpeed, double dt, double maxSpeed);
+  Speed purePursuit(const PointOriented& robotPose, const double linearSpeed);
 
   PurePursuitState state_;
   Trajectory trajectory_;

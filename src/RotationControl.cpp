@@ -6,7 +6,7 @@ namespace rd {
 
 RotationControl::RotationControl(const PositionControlParameters &params) : PositionControlBase(params), state_(eRotationControlState::ACCELERATE) {}
 
-Speed RotationControl::computeSpeed(const PointOriented &robotPose, const Speed &robotSpeed, double dt) {
+Speed RotationControl::computeSpeed(const PointOriented &robotPose, const Speed &robotSpeed, double dt, double) {
   double rotationSpeed = 0.;
   Angle diff = targetAngle_ - robotPose.theta();
   double angleToStop;

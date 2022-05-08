@@ -12,7 +12,7 @@ namespace rd {
 class PositionControlBase {
  public:
   PositionControlBase(const PositionControlParameters params) : params_(params) {}
-  virtual Speed computeSpeed(const PointOriented& robotPose, const Speed& robotSpeed, double dt) = 0;
+  virtual Speed computeSpeed(const PointOriented& robotPose, const Speed& robotSpeed, double dt, double maxSpeed) = 0;
   virtual bool isGoalReached() const = 0;
 
  protected:
