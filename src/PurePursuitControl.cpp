@@ -15,7 +15,6 @@ PurePursuitControl::PurePursuitControl(const PositionControlParameters& params, 
 
 Speed PurePursuitControl::computeSpeed(const PointOriented& robotPose, const Speed& robotSpeed, double dt, double maxSpeed) {
   Angle targetAngle;
-  std::cout << "pp state: " << state_ << std::endl;
   switch (state_) {
     case PurePursuitState::IDLE:
       return Speed(0., 0., 0.);
@@ -145,7 +144,8 @@ Speed PurePursuitControl::purePursuit(const PointOriented& robotPose, const doub
   }
   double vx = linearSpeed;
   size_t previousClosestIndex;
-  Point goal = trajectory_.pointWithSpeedAtDistanceFrom(lookaheadDistance_, robotPose, previousClosestIndex);
+  Point goal = trajectory_.pointWithSpeedAtDistanceFrom(lookaheadDistance_, robotPose,
+                                                        previousClosestIndex);  // If goal is last point (or speed == 0) go into polar control
   trajectoryCurrentIndex_ = previousClosestIndex + 1;
   // ivy.sendPoint(1, goal);
   Point robot2Goal = goal.transformIn(robotPose);
