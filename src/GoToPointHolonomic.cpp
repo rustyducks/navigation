@@ -13,7 +13,6 @@ Speed GoToPointHolonomic::computeSpeed(const PointOriented& robotPose, const Spe
   Point rp = targetPoint_ - robotPose;
   double vlinear = robotSpeed.linearSpeed();
   double lengthToStop;
-  std::cout << "Rotation state: " << rotationState_ << std::endl;
   if (linearState_ == eLinearState::LIDLE) {
     vlinear = 0.;
   }

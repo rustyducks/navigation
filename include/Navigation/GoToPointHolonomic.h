@@ -16,6 +16,11 @@ class GoToPointHolonomic : public PositionControlBase {
     rotationState_ = eRotationState::RACCELERATE;
   };
   bool isGoalReached() const override { return isGoalReached_; }
+  void slowedDown() {
+    if (!isGoalReached_) {
+      linearState_ = LACCELERATE;
+    }
+  }
 
  protected:
   enum eLinearState { LIDLE, LACCELERATE, LCRUISE, LDECELERATE, LMAINTAIN };
