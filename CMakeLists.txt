@@ -36,7 +36,7 @@ endif()
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
 
-add_library(Navigation STATIC src/PurePursuitControl.cpp src/RotationControl.cpp src/LinearControl.cpp src/GoToPointHolonomic.cpp)
+add_library(Navigation STATIC src/PurePursuitControl.cpp src/RotationControl.cpp src/LinearControl.cpp src/GoToPointHolonomic.cpp src/PolarControl.cpp)
 target_link_libraries(Navigation PUBLIC GeometryTools)
 target_link_libraries(Navigation PUBLIC Threads::Threads)
 target_include_directories(Navigation PUBLIC
@@ -44,7 +44,7 @@ target_include_directories(Navigation PUBLIC
     $<INSTALL_INTERFACE:include>
 )
 set_target_properties(Navigation PROPERTIES PUBLIC_HEADER 
-"include/Navigation/LinearControl.h;include/Navigation/Parameters.h;include/Navigation/PositionControlBase.h;include/Navigation/PurePursuitControl.h;include/Navigation/RotationControl.h;include/Navigation/GoToPointHolonomic.h")
+"include/Navigation/LinearControl.h;include/Navigation/Parameters.h;include/Navigation/PositionControlBase.h;include/Navigation/PurePursuitControl.h;include/Navigation/RotationControl.h;include/Navigation/GoToPointHolonomic.h;include/Navigation/PolarControl.h")
 
 
 
